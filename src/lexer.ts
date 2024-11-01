@@ -12,7 +12,12 @@ export enum TokenType {
   Equals = "=",
   Semicolon = ";",
   EOF = "EOF",
-  EqualsEquals = "==", 
+  EqualsEquals = "==",
+  LessThan = "<",
+  MoreThan = ">",
+  NotEquals = "!=",
+  LessThanOrEquals = "<=",
+  MoreThanOrEquals = ">=",
   If = "IF",
   Else = "ELSE",
   LeftBracket = "{",
@@ -32,10 +37,9 @@ export class Lexer {
     this.currentChar = input.length > 0 ? input[0] : null;
   }
 
-  private advance(): void {
+  private advance() {
     this.position++;
-    this.currentChar =
-      this.position < this.input.length ? this.input[this.position] : null;
+    return this.currentChar = this.position < this.input.length ? this.input[this.position] : null;
   }
 
   private skipWhitespace(): void {
@@ -106,6 +110,32 @@ export class Lexer {
           return new Token(TokenType.EqualsEquals, "==");
         }
         return new Token(TokenType.Equals, "=");
+      }
+
+      if (this.currentChar === "!") {
+        const nextChar = this.advance();
+        if (nextChar === "=") {
+          this.advance();
+          return new Token(TokenType.NotEquals, "!=");
+        }
+      }
+
+      if (this.currentChar === "<") {
+        const nextChar = this.advance();
+        if (nextChar === "=") {
+          this.advance();
+          return new Token(TokenType.LessThanOrEquals, "<=");
+        }
+        return new Token(TokenType.LessThan, "<");
+      }
+
+      if (this.currentChar === ">") {
+        const nextChar = this.advance();
+        if (nextChar === "=") {
+          this.advance();
+          return new Token(TokenType.MoreThanOrEquals, ">=");
+        }
+        return new Token(TokenType.MoreThan, ">");
       }
 
       if (operatorTokens[this.currentChar]) {

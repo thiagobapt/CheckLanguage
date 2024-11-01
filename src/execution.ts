@@ -59,12 +59,16 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
 
   } else if (node instanceof WhileNode) {
 
-    const conditionResult = executeAST(node.condition, context);
+    let conditionResult = executeAST(node.condition, context);
+    
+    let whileResult;
 
     while (conditionResult) {
-      return executeAST(node.doBranch, context);
+      whileResult = executeAST(node.doBranch, context);
+      conditionResult = executeAST(node.condition, context);
+      if(!conditionResult) return whileResult;
     }
-    
+
   }
 
   else if (node instanceof ConditionalNode) {

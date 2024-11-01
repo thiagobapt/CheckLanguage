@@ -5,7 +5,7 @@
                       | <while_statement>
                       | <print_statement>
 <assignment>      ::= <name> "=" <expression> ";"
-<if_statement>    ::= "if" <conditional> "{" <statement> ["else" <statement>] "}"
+<if_statement>    ::= "if" "(" <conditional> ")" "{" <statement> | <statement> "}" ["else" "{" <statement> | <statement> "}" ]
 <while_statement> ::= "while" <conditional> "{" <statement> "}"
 <print_statement> ::= "printLn" (<expression> | <string>) ";"
 <expression>      ::= <term> { ("+" | "-") <term> }

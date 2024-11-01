@@ -1,6 +1,9 @@
-whileResult = 0;
-x = 1;
+x = 0;
+y = 0;
 
-while (whileResult < 10) {
-    whileResult = whileResult + 1;
+if(x == 0) {
+    y = 1;
+    if(y == 1) {
+        x = y;
+    }
 }

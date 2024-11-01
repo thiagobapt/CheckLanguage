@@ -22,11 +22,47 @@ export class Parser {
   // parte nova 
   private conditional(): ASTNode {
     const left = this.expr();
-    if (this.currentToken.type === TokenType.EqualsEquals) {
-      this.eat(TokenType.EqualsEquals);
-      const right = this.expr();
-      return new ConditionalNode(left, "==", right);
+
+    switch(this.currentToken.type) {
+
+      case TokenType.EqualsEquals: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "==", right);
+      }
+
+      case TokenType.NotEquals: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "!=", right);
+      }
+
+      case TokenType.MoreThan: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, ">", right);
+      }
+
+      case TokenType.LessThan: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "<", right);
+      }
+
+      case TokenType.MoreThanOrEquals: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, ">=", right);
+      }
+
+      case TokenType.LessThanOrEquals: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "<=", right);
+      }
+
     }
+
     return left;
   }
   
@@ -61,7 +97,7 @@ export class Parser {
     this.eat(TokenType.RightParen);
 
     this.eat(TokenType.LeftBracket);
-    const doBranch = this.assignment();
+    const doBranch = this.statement();
     this.eat(TokenType.RightBracket);
 
     return new WhileNode(condition, doBranch);

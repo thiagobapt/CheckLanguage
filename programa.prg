@@ -1,9 +1,5 @@
 x = 0;
-y = 0;
 
-if(x == 0) {
-    y = 1;
-    if(y == 1) {
-        x = y;
-    }
+for (index = 0; index < 10; index = index + 1;) {
+    x = x + 1;
 }

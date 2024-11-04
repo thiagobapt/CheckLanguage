@@ -1,12 +1,15 @@
 <program>         ::= <statement> | <statement> <program>
+<statement_list>  ::= <statement> { <statement> }
 <statement>       ::= <assignment> 
                       | <expression> ";"
                       | <if_statement>
                       | <while_statement>
                       | <print_statement>
+                      | <for_statement>
 <assignment>      ::= <name> "=" <expression> ";"
-<if_statement>    ::= "if" "(" <conditional> ")" "{" <statement> | <statement> "}" ["else" "{" <statement> | <statement> "}" ]
-<while_statement> ::= "while" <conditional> "{" <statement> "}"
+<if_statement>    ::= "if" "(" <conditional> ")" "{" <statement_list> "}" ["else" "{" <statement_list> "}" ]
+<while_statement> ::= "while" "(" <conditional> ")" "{" <statement> "}"
+<for_statement>   ::= "for" "(" <assignment> ";" <conditional> ";" <statement> ")" "{" <statement> "}"
 <print_statement> ::= "printLn" (<expression> | <string>) ";"
 <expression>      ::= <term> { ("+" | "-") <term> }
 <term>            ::= <factor> { ("*" | "/") <factor> }

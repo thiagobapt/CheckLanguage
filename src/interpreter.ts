@@ -1,7 +1,7 @@
 import { Lexer, TokenType } from "./lexer";
 import { Parser } from "./parser";
 import { ExecutionContext, executeAST } from './execution';
-import { BinaryOpNode, NumberNode, IfNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, IfNode, ASTNode } from "./ast-nodes";
 
 // Função para converter um nó da AST em JSON
 function astNodeToJson(node: any): any {
@@ -46,11 +46,11 @@ export function interpretProgram(input: string) {
     const lexer = new Lexer(input);
     const parser = new Parser(lexer);
 
-    const astNodes = [];
+    const astNodes: ASTNode[] = [];
     while (lexer.lookAhead().type !== TokenType.EOF) {
       const astNode = parser.parse();
       astNodes.push(astNodeToJson(astNode));
-      console.log("ast node ", astNode)
+      console.log("ast node ", JSON.stringify(astNode, null, 4));
       executeAST(astNode, context);
     }
 

@@ -58,8 +58,8 @@ export interface ASTNode {
     id: number;
     constructor(
       public condition: ASTNode,
-      public thenBranch: ASTNode,
-      public elseBranch: ASTNode | null = null
+      public thenBranch: ASTNode[],
+      public elseBranch: ASTNode[] | null = null
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -70,11 +70,24 @@ export interface ASTNode {
     id: number;
     constructor(
       public condition: ASTNode,
-      public doBranch: ASTNode,
+      public doBranch: ASTNode[],
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
     type = "While";
+  }
+
+  export class ForNode implements ASTNode {
+    id: number;
+    constructor(
+      public index: ASTNode,
+      public condition: ASTNode,
+      public endStatement: ASTNode,
+      public doBranch: ASTNode[],
+    ) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "For";
   }
   
   class ASTNodeCounter {

@@ -8,6 +8,7 @@ import {
   IfNode,
   ConditionalNode,
   WhileNode,
+  ForNode,
 } from "./ast-nodes";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
 
@@ -52,22 +53,49 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
 
     const conditionResult = executeAST(node.condition, context);
     if (conditionResult) {
-      return executeAST(node.thenBranch, context);
+
+      for(const thenNode of node.thenBranch) {
+        executeAST(thenNode, context);
+      }
+
+      return 0;
+
     } else if (node.elseBranch) {
-      return executeAST(node.elseBranch, context);
+
+      for(const elseNode of node.elseBranch) {
+        executeAST(elseNode, context);
+      }
+
+      return 0;
     }
 
   } else if (node instanceof WhileNode) {
 
     let conditionResult = executeAST(node.condition, context);
-    
-    let whileResult;
 
     while (conditionResult) {
-      whileResult = executeAST(node.doBranch, context);
+      for(const doNode of node.doBranch) {
+        executeAST(doNode, context)
+      }
       conditionResult = executeAST(node.condition, context);
-      if(!conditionResult) return whileResult;
+      if(!conditionResult) return 0;
     }
+
+  } else if (node instanceof ForNode) {
+
+    executeAST(node.index, context);
+
+    let conditionResult = executeAST(node.condition, context);
+
+    while (conditionResult) {
+      for(const doNode of node.doBranch) {
+        executeAST(doNode, context)
+      }
+      executeAST(node.endStatement, context);
+      conditionResult = executeAST(node.condition, context);
+    }
+
+    return 0;
 
   }
 
@@ -79,5 +107,5 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
 
   } 
 
-  throw new Error("Unsupported AST node.");
+  throw new Error(`Unsupported AST node: ${JSON.stringify(node, null, 4)}`);
 }

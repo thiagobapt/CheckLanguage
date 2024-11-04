@@ -22,7 +22,8 @@ export enum TokenType {
   Else = "ELSE",
   LeftBracket = "{",
   RightBracket = "}",
-  While = "WHILE"
+  While = "WHILE",
+  For = "FOR"
 }
 
 export class Token {
@@ -67,9 +68,10 @@ export class Lexer {
       this.advance();
     }
     if (result === "if") return new Token(TokenType.If, result);     // implementação do IF
-    if (result === "else") return new Token(TokenType.Else, result); // implementação do IF
+    if (result === "else") return new Token(TokenType.Else, result); // implementação do Else
 
     if (result === "while") return new Token(TokenType.While, result); // implementação do While
+    if (result === "for") return new Token(TokenType.For, result); // implementação do For
 
     return new Token(TokenType.Name, result);
   }

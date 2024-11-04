@@ -1,6 +1,6 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode } from "./ast-nodes";
 
 export class Parser {
   private currentToken!: Token;
@@ -14,7 +14,7 @@ export class Parser {
       this.currentToken = this.lexer.getNextToken();
     } else {
       throw new Error(
-        `Unexpected token: ${this.currentToken.type}, expected: ${tokenType}`
+        `Unexpected token: ${this.currentToken.type} (${this.currentToken.value}), expected: ${tokenType}`
       );
     }
   }
@@ -75,14 +75,14 @@ export class Parser {
     this.eat(TokenType.RightParen);
     
     this.eat(TokenType.LeftBracket);
-    const thenBranch = this.statement(); // Parse do bloco `then`
+    const thenBranch: ASTNode[] = this.statement_list();
     this.eat(TokenType.RightBracket);
   
-    let elseBranch = null;
+    let elseBranch: ASTNode[] = [];
     if (this.currentToken.type === TokenType.Else) {
       this.eat(TokenType.Else);
       this.eat(TokenType.LeftBracket);
-      elseBranch = this.statement(); // Parse do bloco `else`
+      elseBranch = this.statement_list();
       this.eat(TokenType.RightBracket);
     }
   
@@ -97,10 +97,27 @@ export class Parser {
     this.eat(TokenType.RightParen);
 
     this.eat(TokenType.LeftBracket);
-    const doBranch = this.statement();
+    const doBranch: ASTNode[] = this.statement_list();;
     this.eat(TokenType.RightBracket);
 
     return new WhileNode(condition, doBranch);
+  }
+
+  private forStatement(): ASTNode {
+    this.eat(TokenType.For);
+    
+    this.eat(TokenType.LeftParen);
+    const index = this.assignment();
+    const condition = this.conditional(); // Parse da condição
+    this.eat(TokenType.Semicolon);
+    const endStatement = this.statement();
+    this.eat(TokenType.RightParen);
+
+    this.eat(TokenType.LeftBracket);
+    const doBranch: ASTNode[] = this.statement_list();;
+    this.eat(TokenType.RightBracket);
+
+    return new ForNode(index, condition, endStatement, doBranch);
   }
   
   // fim da parte nova
@@ -157,11 +174,26 @@ export class Parser {
     return new AssignmentNode(new NameNode(variableToken.value), exprNode);
   }
 
+  public statement_list(): ASTNode[] {
+    const statements: ASTNode[] = [];
+    while(
+      this.currentToken.type == TokenType.If ||
+      this.currentToken.type == TokenType.While ||
+      this.currentToken.type == TokenType.For ||
+      this.currentToken.type == TokenType.Name
+    ) {
+      statements.push(this.statement());
+    }
+    return statements;
+  }
+
   public statement(): ASTNode {
     if (this.currentToken.type === TokenType.If) {
       return this.ifStatement();
     } else if (this.currentToken.type === TokenType.While) {
       return this.whileStatement();
+    } else if (this.currentToken.type === TokenType.For) {
+      return this.forStatement();
     }
     else if (this.currentToken.type === TokenType.Name) {
       const nextToken = this.lexer.lookAhead();

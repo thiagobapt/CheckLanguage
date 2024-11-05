@@ -16,6 +16,7 @@
 <factor>          ::= <number> 
                       | <name> 
                       | <string>
+                      | <boolean>
                       | "(" <expression> ")"
 <conditional> ::= <bool_term> { ("or") <bool_term> }
 <bool_term> ::= <bool_factor> { ("and") <bool_factor> }

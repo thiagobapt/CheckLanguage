@@ -11,15 +11,20 @@ import {
   ForNode,
 } from "./ast-nodes";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
+import { BooleanVariable, NullVariable, NumberVariable, Variable, VariableType } from "./variables";
 
 export class ExecutionContext {
-  private variables: { [key: string]: number } = {};
+  private variables: { [key: string]: Variable } = {};
 
-  public setVariable(name: string, value: number) {
-    this.variables[name] = value;
+  public setVariable(name: string, variable: Variable) {
+    this.variables[name] = variable;
   }
 
-  public getVariable(name: string): number {
+  public deleteVariable(name: string) {
+    delete this.variables[name];
+  }
+
+  public getVariable(name: string): Variable {
     if (!(name in this.variables)) {
       throw new Error(`Variable "${name}" is not defined.`);
     }
@@ -27,17 +32,22 @@ export class ExecutionContext {
   }
 }
 
-export function executeAST(node: ASTNode, context: ExecutionContext): number {
+export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
   if (node instanceof BinaryOpNode) {
 
     const left = executeAST(node.left, context);
     const right = executeAST(node.right, context);
+
+    
+    if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and not of type ${VariableType.Number}`);
+    if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and not of type ${VariableType.Number}`);
+
     return evaluateBinaryOp(node.operator, left, right);
 
   } else if (node instanceof NumberNode) {
 
-    return parseFloat(node.value);
+    return new NumberVariable(parseFloat(node.value));
 
   } else if (node instanceof NameNode) {
 
@@ -46,6 +56,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
   } else if (node instanceof AssignmentNode) {
 
     const value = executeAST(node.value, context);
+    value.name = node.name.value;
     context.setVariable(node.name.value, value);
     return value;
 
@@ -58,7 +69,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
         executeAST(thenNode, context);
       }
 
-      return 0;
+      return new NullVariable();
 
     } else if (node.elseBranch) {
 
@@ -66,36 +77,37 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
         executeAST(elseNode, context);
       }
 
-      return 0;
+      return new NullVariable();
     }
 
   } else if (node instanceof WhileNode) {
 
-    let conditionResult = executeAST(node.condition, context);
+    let conditionResult: BooleanVariable = executeAST(node.condition, context) as BooleanVariable;
 
-    while (conditionResult) {
+    while (conditionResult.value) {
       for(const doNode of node.doBranch) {
         executeAST(doNode, context)
       }
-      conditionResult = executeAST(node.condition, context);
-      if(!conditionResult) return 0;
+      conditionResult = executeAST(node.condition, context) as BooleanVariable;
+      console.log(conditionResult);
+      if(!conditionResult.value) return new NullVariable();
     }
 
   } else if (node instanceof ForNode) {
 
     executeAST(node.index, context);
 
-    let conditionResult = executeAST(node.condition, context);
+    let conditionResult: BooleanVariable = executeAST(node.condition, context) as BooleanVariable;
 
-    while (conditionResult) {
+    while (conditionResult.value) {
       for(const doNode of node.doBranch) {
         executeAST(doNode, context)
       }
       executeAST(node.endStatement, context);
-      conditionResult = executeAST(node.condition, context);
+      conditionResult = executeAST(node.condition, context) as BooleanVariable;
     }
 
-    return 0;
+    return new NullVariable();
 
   }
 
@@ -103,7 +115,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): number {
 
     const left = executeAST(node.left, context);
     const right = executeAST(node.right, context);
-    return evaluateCondition(node.operator, left, right) ? 1 : 0;;
+    return evaluateCondition(node.operator, left, right);
 
   } 
 

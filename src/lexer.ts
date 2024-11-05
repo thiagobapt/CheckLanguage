@@ -8,6 +8,9 @@ export enum TokenType {
   LeftParen = "(",
   RightParen = ")",
   Number = "NUMBER",
+  Boolean = "BOOLEAN",
+  String = "STRING",
+  Quotation = "\"",
   Name = "NAME",
   Equals = "=",
   Semicolon = ";",
@@ -62,11 +65,15 @@ export class Lexer {
     let result = "";
     while (
       this.currentChar !== null &&
-      /[a-zA-Z_][a-zA-Z0-9_]*/.test(this.currentChar)
+      /"{0,1}[a-zA-Z_][a-zA-Z0-9_]*"{0,1}/.test(this.currentChar)
     ) {
       result += this.currentChar;
       this.advance();
     }
+
+    if(/"[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) return new Token(TokenType.String, result.substring(1, result.length - 1));
+    if(/"[a-zA-Z_][a-zA-Z0-9_]*/.test(result) || /[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) throw new Error(`Cannot have hanging quote (") operator.`)
+
     if (result === "if") return new Token(TokenType.If, result);     // implementação do IF
     if (result === "else") return new Token(TokenType.Else, result); // implementação do Else
 

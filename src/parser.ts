@@ -9,9 +9,9 @@ export class Parser {
     this.currentToken = this.lexer.getNextToken();
   }
 
-  private eat(tokenType: TokenType, startString: boolean = false): void {
+  private eat(tokenType: TokenType): void {
     if (this.currentToken.type === tokenType) {
-      this.currentToken = this.lexer.getNextToken(startString);
+      this.currentToken = this.lexer.getNextToken();
     } else {
       throw new Error(
         `Unexpected token: ${this.currentToken.type} (${this.currentToken.value}), expected: ${tokenType}`
@@ -141,13 +141,10 @@ export class Parser {
 
       return new FunctionNode(token.value, parameters);
 
-    } else if (token.type === TokenType.Quotation) {
-      this.eat(TokenType.Quotation);
-      this.eat(TokenType.String, true);
-      const string = new StringNode(token.value);
-      this.eat(TokenType.Quotation);
+    } else if (token.type === TokenType.String) {
 
-      return string;
+      this.eat(TokenType.String);
+      return new StringNode(token.value);
 
     } else if (token.type === TokenType.Boolean) {
       this.eat(TokenType.Boolean);
@@ -227,7 +224,8 @@ export class Parser {
       this.currentToken.type == TokenType.If ||
       this.currentToken.type == TokenType.While ||
       this.currentToken.type == TokenType.For ||
-      this.currentToken.type == TokenType.Name
+      this.currentToken.type == TokenType.Name ||
+      this.currentToken.type == TokenType.Function
     ) {
       statements.push(this.statement());
     }

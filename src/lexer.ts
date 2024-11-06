@@ -98,16 +98,16 @@ export class Lexer {
     let result = "";
     while (
       this.currentChar !== null &&
-      this.currentChar !== '"'
+      !/".*"/.test(result)
     ) {
       result += this.currentChar;
       this.advance();
     }
 
-    return new Token(TokenType.String, result);
+    return new Token(TokenType.String, result.substring(1,result.length - 1));
   }
 
-  public getNextToken(string: boolean = false): Token {
+  public getNextToken(): Token {
     const operatorTokens: { [key: string]: TokenType } = {
       "+": TokenType.Plus,
       "-": TokenType.Minus,
@@ -125,7 +125,7 @@ export class Lexer {
 
     while (this.currentChar !== null) {
 
-      if(string) {
+      if(/"/.test(this.currentChar)) {
         return this.string();
       }
 

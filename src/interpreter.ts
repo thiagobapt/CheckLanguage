@@ -60,10 +60,10 @@ export function interpretProgram(input: string) {
     // console.log(astJson);
 
     // Exibir o resultado final de todas as variáveis armazenadas no contexto
-    console.log("Valores das variáveis:");
-    for (const [name, value] of Object.entries(context['variables'])) {
-      console.log(`${name}: ${JSON.stringify(value)}`);
-    }
+    // console.log("Valores das variáveis:");
+    // for (const [name, value] of Object.entries(context['variables'])) {
+    //   console.log(`${name}: ${JSON.stringify(value)}`);
+    // }
 
     return astJson;
   } catch (error) {

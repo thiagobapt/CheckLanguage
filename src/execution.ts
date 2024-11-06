@@ -9,14 +9,29 @@ import {
   ConditionalNode,
   WhileNode,
   ForNode,
+  InitializationNode,
+  StringNode,
+  BooleanNode,
+  FunctionNode,
 } from "./ast-nodes";
+import { printLn } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
-import { BooleanVariable, NullVariable, NumberVariable, Variable, VariableType } from "./variables";
+import { BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class ExecutionContext {
   private variables: { [key: string]: Variable } = {};
 
   public setVariable(name: string, variable: Variable) {
+    if (!(name in this.variables)) {
+      throw new Error(`Variable "${name}" is not defined.`);
+    }
+    if(this.variables[name].type !== variable.type) {
+      throw new Error(`Variable "${name}" (${this.variables[name].type}) is not of type ${variable.type}.`);
+    }
+    this.variables[name] = variable;
+  }
+
+  public initializeVariable(name: string, variable: Variable) {
     this.variables[name] = variable;
   }
 
@@ -40,14 +55,22 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     const right = executeAST(node.right, context);
 
     
-    if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and not of type ${VariableType.Number}`);
-    if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and not of type ${VariableType.Number}`);
+    if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and can't be used in a math operation.`);
+    if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and can't be used in a math operation.`);
 
     return evaluateBinaryOp(node.operator, left, right);
 
   } else if (node instanceof NumberNode) {
 
     return new NumberVariable(parseFloat(node.value));
+
+  } else if (node instanceof StringNode) {
+
+    return new StringVariable(node.value);
+
+  } else if (node instanceof BooleanNode) {
+    const value = node.value === "true";
+    return new BooleanVariable(value);
 
   } else if (node instanceof NameNode) {
 
@@ -60,10 +83,17 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     context.setVariable(node.name.value, value);
     return value;
 
+  }  else if (node instanceof InitializationNode) {
+
+    const value = executeAST(node.value, context);
+    value.name = node.name.value;
+    context.initializeVariable(node.name.value, value);
+    return value;
+
   } else if (node instanceof IfNode) {
 
     const conditionResult = executeAST(node.condition, context);
-    if (conditionResult) {
+    if (conditionResult.value) {
 
       for(const thenNode of node.thenBranch) {
         executeAST(thenNode, context);
@@ -89,7 +119,6 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
         executeAST(doNode, context)
       }
       conditionResult = executeAST(node.condition, context) as BooleanVariable;
-      console.log(conditionResult);
       if(!conditionResult.value) return new NullVariable();
     }
 
@@ -105,6 +134,23 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       }
       executeAST(node.endStatement, context);
       conditionResult = executeAST(node.condition, context) as BooleanVariable;
+    }
+
+    return new NullVariable();
+
+  } else if (node instanceof FunctionNode) {
+    const variableParameters: Variable[] = [];
+
+    for(const parameter of node.parameters) {
+      variableParameters.push(executeAST(parameter, context));
+    }
+
+    if(node.value === "printLn") {
+      if(variableParameters.length < 1) 
+        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
+      printLn(variableParameters);
+    } else {
+      throw new Error(`Function ${node.value} is not defined.`)
     }
 
     return new NullVariable();

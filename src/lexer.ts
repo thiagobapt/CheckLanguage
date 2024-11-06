@@ -14,6 +14,7 @@ export enum TokenType {
   Name = "NAME",
   Equals = "=",
   Semicolon = ";",
+  Comma = ",",
   EOF = "EOF",
   EqualsEquals = "==",
   LessThan = "<",
@@ -26,7 +27,9 @@ export enum TokenType {
   LeftBracket = "{",
   RightBracket = "}",
   While = "WHILE",
-  For = "FOR"
+  For = "FOR",
+  Var = "VAR",
+  Function = "FUNCTION"
 }
 
 export class Token {
@@ -65,25 +68,46 @@ export class Lexer {
     let result = "";
     while (
       this.currentChar !== null &&
-      /"{0,1}[a-zA-Z_][a-zA-Z0-9_]*"{0,1}/.test(this.currentChar)
+      /["]{0,1}[a-zA-Z_][a-zA-Z0-9_]*["]{0,1}/.test(this.currentChar)
     ) {
       result += this.currentChar;
       this.advance();
     }
 
     if(/"[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) return new Token(TokenType.String, result.substring(1, result.length - 1));
-    if(/"[a-zA-Z_][a-zA-Z0-9_]*/.test(result) || /[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) throw new Error(`Cannot have hanging quote (") operator.`)
+    if(/"[a-zA-Z_][a-zA-Z0-9_]*/.test(result) || /[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) throw new Error(`Cannot have (") hanging.`)
+
+    if (
+      result === "true" ||
+      result === "false"
+    ) return new Token(TokenType.Boolean, result); // implementação do Boolean
 
     if (result === "if") return new Token(TokenType.If, result);     // implementação do IF
     if (result === "else") return new Token(TokenType.Else, result); // implementação do Else
 
     if (result === "while") return new Token(TokenType.While, result); // implementação do While
     if (result === "for") return new Token(TokenType.For, result); // implementação do For
+    if (result === "var") return new Token(TokenType.Var, result); // implementação de inicialização
+
+    if (this.lookAhead().type === TokenType.LeftParen) return new Token(TokenType.Function, result);
 
     return new Token(TokenType.Name, result);
   }
 
-  public getNextToken(): Token {
+  private string(): Token {
+    let result = "";
+    while (
+      this.currentChar !== null &&
+      this.currentChar !== '"'
+    ) {
+      result += this.currentChar;
+      this.advance();
+    }
+
+    return new Token(TokenType.String, result);
+  }
+
+  public getNextToken(string: boolean = false): Token {
     const operatorTokens: { [key: string]: TokenType } = {
       "+": TokenType.Plus,
       "-": TokenType.Minus,
@@ -95,9 +119,16 @@ export class Lexer {
       ";": TokenType.Semicolon,
       "{": TokenType.LeftBracket,
       "}": TokenType.RightBracket,
+      "\"": TokenType.Quotation,
+      ",": TokenType.Comma
     };
 
     while (this.currentChar !== null) {
+
+      if(string) {
+        return this.string();
+      }
+
       if (/\s/.test(this.currentChar)) {
         this.skipWhitespace();
         continue;
@@ -169,4 +200,5 @@ export class Lexer {
     this.currentChar = this.input[this.position] || null;
     return token;
   }
+
 }

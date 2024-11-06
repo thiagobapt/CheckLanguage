@@ -1,6 +1,6 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionNode } from "./ast-nodes";
 
 export class Parser {
   private currentToken!: Token;
@@ -9,9 +9,9 @@ export class Parser {
     this.currentToken = this.lexer.getNextToken();
   }
 
-  private eat(tokenType: TokenType): void {
+  private eat(tokenType: TokenType, startString: boolean = false): void {
     if (this.currentToken.type === tokenType) {
-      this.currentToken = this.lexer.getNextToken();
+      this.currentToken = this.lexer.getNextToken(startString);
     } else {
       throw new Error(
         `Unexpected token: ${this.currentToken.type} (${this.currentToken.value}), expected: ${tokenType}`
@@ -107,7 +107,7 @@ export class Parser {
     this.eat(TokenType.For);
     
     this.eat(TokenType.LeftParen);
-    const index = this.assignment();
+    const index = this.initialization();
     const condition = this.conditional(); // Parse da condição
     this.eat(TokenType.Semicolon);
     const endStatement = this.statement();
@@ -130,6 +130,28 @@ export class Parser {
     } else if (token.type === TokenType.Name) {
       this.eat(TokenType.Name);
       return new NameNode(token.value);
+    } else if (token.type === TokenType.Function) {
+
+      this.eat(TokenType.Function);
+      this.eat(TokenType.LeftParen);
+      const parameters = this.parameters();
+      this.eat(TokenType.RightParen);
+
+      if(this.currentToken.type === TokenType.Semicolon) this.eat(TokenType.Semicolon);
+
+      return new FunctionNode(token.value, parameters);
+
+    } else if (token.type === TokenType.Quotation) {
+      this.eat(TokenType.Quotation);
+      this.eat(TokenType.String, true);
+      const string = new StringNode(token.value);
+      this.eat(TokenType.Quotation);
+
+      return string;
+
+    } else if (token.type === TokenType.Boolean) {
+      this.eat(TokenType.Boolean);
+      return new BooleanNode(token.value);
     } else if (token.type === TokenType.LeftParen) {
       this.eat(TokenType.LeftParen);
       const node = this.expr();
@@ -165,6 +187,21 @@ export class Parser {
     return node;
   }
 
+  private parameters(): ASTNode[] {
+    const expressions: ASTNode[] = [];
+    while(
+      this.currentToken.type == TokenType.Name ||
+      this.currentToken.type == TokenType.Number ||
+      this.currentToken.type == TokenType.String ||
+      this.currentToken.type == TokenType.Boolean ||
+      this.currentToken.type == TokenType.Comma
+    ) {
+      if(this.currentToken.type === TokenType.Comma) this.eat(TokenType.Comma);
+      expressions.push(this.expr());
+    }
+    return expressions;
+  }
+
   private assignment(): ASTNode {
     const variableToken = this.currentToken;
     this.eat(TokenType.Name);
@@ -172,6 +209,16 @@ export class Parser {
     const exprNode = this.expr();
     this.eat(TokenType.Semicolon);
     return new AssignmentNode(new NameNode(variableToken.value), exprNode);
+  }
+
+  private initialization(): ASTNode {
+    this.eat(TokenType.Var);
+    const variableToken = this.currentToken;
+    this.eat(TokenType.Name);
+    this.eat(TokenType.Equals);
+    const exprNode = this.expr();
+    this.eat(TokenType.Semicolon);
+    return new InitializationNode(new NameNode(variableToken.value), exprNode);
   }
 
   public statement_list(): ASTNode[] {
@@ -200,6 +247,13 @@ export class Parser {
       if (nextToken.type === TokenType.Equals) {
         return this.assignment();
       }
+    }
+    else if (this.currentToken.type === TokenType.Var) {
+      const nextToken = this.lexer.lookAhead();
+      if (nextToken.type === TokenType.Name) {
+        return this.initialization();
+      }
+      throw new Error("Variable declariation expected.")
     }
     return this.expr();
   }

@@ -23,6 +23,22 @@ export interface ASTNode {
     }
     type = "Number";
   }
+
+  export class StringNode implements ASTNode {
+    id: number;
+    constructor(public value: string) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "String";
+  }
+
+  export class BooleanNode implements ASTNode {
+    id: number;
+    constructor(public value: string) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Boolean";
+  }
   
   export class NameNode implements ASTNode {
     id: number;
@@ -30,6 +46,25 @@ export interface ASTNode {
       this.id = ASTNodeCounter.getNextId();
     }
     type = "Name";
+  }
+
+  export class FunctionNode implements ASTNode {
+    id: number;
+    constructor(
+      public value: string,
+      public parameters: ASTNode[]
+    ) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Function";
+  }
+
+  export class InitializationNode implements ASTNode {
+    id: number;
+    constructor(public name: NameNode, public value: ASTNode) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Initialization";
   }
   
   export class AssignmentNode implements ASTNode {

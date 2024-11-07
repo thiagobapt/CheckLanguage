@@ -137,15 +137,19 @@ export class Parser {
       const parameters = this.parameters();
       this.eat(TokenType.RightParen);
 
-      if(this.currentToken.type === TokenType.Semicolon) this.eat(TokenType.Semicolon);
-
       return new FunctionNode(token.value, parameters);
 
-    } else if (token.type === TokenType.String) {
+    } else if (token.type === TokenType.Quotation) {
 
+      this.eat(TokenType.Quotation);
+      const node = this.factor();
+      this.eat(TokenType.Quotation);
+
+      return node;
+
+    } else if (token.type === TokenType.String) {
       this.eat(TokenType.String);
       return new StringNode(token.value);
-
     } else if (token.type === TokenType.Boolean) {
       this.eat(TokenType.Boolean);
       return new BooleanNode(token.value);
@@ -190,6 +194,8 @@ export class Parser {
       this.currentToken.type == TokenType.Name ||
       this.currentToken.type == TokenType.Number ||
       this.currentToken.type == TokenType.String ||
+      this.currentToken.type == TokenType.Quotation ||
+      this.currentToken.type == TokenType.CloseQuotation ||
       this.currentToken.type == TokenType.Boolean ||
       this.currentToken.type == TokenType.Comma
     ) {
@@ -247,11 +253,7 @@ export class Parser {
       }
     }
     else if (this.currentToken.type === TokenType.Var) {
-      const nextToken = this.lexer.lookAhead();
-      if (nextToken.type === TokenType.Name) {
-        return this.initialization();
-      }
-      throw new Error("Variable declariation expected.")
+      return this.initialization();
     }
     return this.expr();
   }

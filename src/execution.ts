@@ -14,7 +14,7 @@ import {
   BooleanNode,
   FunctionNode,
 } from "./ast-nodes";
-import { printLn } from "./functions";
+import { concat, printLn } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
 import { BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
@@ -32,6 +32,9 @@ export class ExecutionContext {
   }
 
   public initializeVariable(name: string, variable: Variable) {
+    if ((name in this.variables)) {
+      throw new Error(`Variable "${name}" was already initialized.`);
+    }
     this.variables[name] = variable;
   }
 
@@ -53,7 +56,6 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
     const left = executeAST(node.left, context);
     const right = executeAST(node.right, context);
-
     
     if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and can't be used in a math operation.`);
     if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and can't be used in a math operation.`);
@@ -146,9 +148,17 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     }
 
     if(node.value === "printLn") {
+
       if(variableParameters.length < 1) 
         throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
       printLn(variableParameters);
+
+    } else if(node.value === "concat") {
+
+      if(variableParameters.length < 1) 
+        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
+      return concat(variableParameters);
+
     } else {
       throw new Error(`Function ${node.value} is not defined.`)
     }

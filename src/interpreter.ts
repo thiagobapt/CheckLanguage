@@ -50,7 +50,7 @@ export function interpretProgram(input: string) {
     while (lexer.lookAhead().type !== TokenType.EOF) {
       const astNode = parser.parse();
       astNodes.push(astNodeToJson(astNode));
-      console.log("ast node ", JSON.stringify(astNode, null, 4));
+      // console.log("ast node ", JSON.stringify(astNode, null, 4));
       executeAST(astNode, context);
     }
 

@@ -8,7 +8,8 @@ function main() {
     const input = fs.readFileSync("programa.prg", "utf8");
 
     // Passa o conteúdo para o interpretador executar
-    interpretProgram(input);
+    const result = interpretProgram(input);
+    // console.log(result);
   } catch (error) {
     console.error("Erro durante a leitura do arquivo:");
     console.error(error);

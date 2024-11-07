@@ -11,6 +11,7 @@ export enum TokenType {
   Boolean = "BOOLEAN",
   String = "STRING",
   Quotation = "\"",
+  CloseQuotation = "CLOSE_QUOTATION",
   Name = "NAME",
   Equals = "=",
   Semicolon = ";",
@@ -39,6 +40,7 @@ export class Token {
 export class Lexer {
   private position: number = 0;
   private currentChar: string | null = null;
+  private previousTokenType: TokenType = TokenType.EOF;
 
   constructor(private readonly input: string) {
     this.currentChar = input.length > 0 ? input[0] : null;
@@ -61,50 +63,64 @@ export class Lexer {
       result += this.currentChar;
       this.advance();
     }
+    this.previousTokenType = TokenType.Number;
     return new Token(TokenType.Number, result);
   }
 
   private name(): Token {
     let result = "";
+
+    let regexp = this.previousTokenType === TokenType.Quotation ? /^[^"]*$/ : /^[a-zA-Z0-9_]*$/;
     while (
       this.currentChar !== null &&
-      /["]{0,1}[a-zA-Z_][a-zA-Z0-9_]*["]{0,1}/.test(this.currentChar)
+      regexp.test(this.currentChar)
     ) {
       result += this.currentChar;
       this.advance();
     }
-
-    if(/"[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) return new Token(TokenType.String, result.substring(1, result.length - 1));
-    if(/"[a-zA-Z_][a-zA-Z0-9_]*/.test(result) || /[a-zA-Z_][a-zA-Z0-9_]*"/.test(result)) throw new Error(`Cannot have (") hanging.`)
+    
+    if(this.previousTokenType === TokenType.Quotation) {
+      this.previousTokenType = TokenType.String;
+      return new Token(TokenType.String, result);
+    }
 
     if (
       result === "true" ||
       result === "false"
-    ) return new Token(TokenType.Boolean, result); // implementação do Boolean
-
-    if (result === "if") return new Token(TokenType.If, result);     // implementação do IF
-    if (result === "else") return new Token(TokenType.Else, result); // implementação do Else
-
-    if (result === "while") return new Token(TokenType.While, result); // implementação do While
-    if (result === "for") return new Token(TokenType.For, result); // implementação do For
-    if (result === "var") return new Token(TokenType.Var, result); // implementação de inicialização
-
-    if (this.lookAhead().type === TokenType.LeftParen) return new Token(TokenType.Function, result);
-
-    return new Token(TokenType.Name, result);
-  }
-
-  private string(): Token {
-    let result = "";
-    while (
-      this.currentChar !== null &&
-      !/".*"/.test(result)
     ) {
-      result += this.currentChar;
-      this.advance();
+      this.previousTokenType = TokenType.Boolean;
+      return new Token(TokenType.Boolean, result); // implementação do Boolean
     }
 
-    return new Token(TokenType.String, result.substring(1,result.length - 1));
+    if (result === "if") {
+      this.previousTokenType = TokenType.If;
+      return new Token(TokenType.If, result);     // implementação do IF
+    }
+    if (result === "else"){
+      this.previousTokenType = TokenType.Else;
+      return new Token(TokenType.Else, result); // implementação do Else
+    }
+
+    if (result === "while") {
+      this.previousTokenType = TokenType.While;
+      return new Token(TokenType.While, result); // implementação do While
+    }
+    if (result === "for") {
+      this.previousTokenType = TokenType.For;
+      return new Token(TokenType.For, result); // implementação do For
+    }
+    if (result === "var") {
+      this.previousTokenType = TokenType.Var;
+      return new Token(TokenType.Var, result); // implementação de inicialização
+    }
+
+    if (this.lookAhead().type === TokenType.LeftParen) {
+      this.previousTokenType = TokenType.Function;
+      return new Token(TokenType.Function, result);
+    }
+    
+    this.previousTokenType = TokenType.Name;
+    return new Token(TokenType.Name, result);
   }
 
   public getNextToken(): Token {
@@ -125,8 +141,8 @@ export class Lexer {
 
     while (this.currentChar !== null) {
 
-      if(/"/.test(this.currentChar)) {
-        return this.string();
+      if (this.previousTokenType === TokenType.Quotation) {
+        return this.name();
       }
 
       if (/\s/.test(this.currentChar)) {
@@ -147,8 +163,10 @@ export class Lexer {
         // Implementação da igualdade 
         if (this.currentChar === "=") {
           this.advance();
+          this.previousTokenType = TokenType.EqualsEquals;
           return new Token(TokenType.EqualsEquals, "==");
         }
+        this.previousTokenType = TokenType.Equals;
         return new Token(TokenType.Equals, "=");
       }
 
@@ -156,6 +174,7 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
+          this.previousTokenType = TokenType.NotEquals;
           return new Token(TokenType.NotEquals, "!=");
         }
       }
@@ -164,8 +183,10 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
+          this.previousTokenType = TokenType.LessThanOrEquals;
           return new Token(TokenType.LessThanOrEquals, "<=");
         }
+        this.previousTokenType = TokenType.LessThan;
         return new Token(TokenType.LessThan, "<");
       }
 
@@ -173,8 +194,10 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
+          this.previousTokenType = TokenType.MoreThanOrEquals;
           return new Token(TokenType.MoreThanOrEquals, ">=");
         }
+        this.previousTokenType = TokenType.MoreThan;
         return new Token(TokenType.MoreThan, ">");
       }
 
@@ -183,6 +206,13 @@ export class Lexer {
           operatorTokens[this.currentChar],
           this.currentChar
         );
+
+        if(this.previousTokenType === TokenType.String && operatorTokens[this.currentChar] === TokenType.Quotation) {
+          this.previousTokenType = TokenType.CloseQuotation;
+        } else {
+          this.previousTokenType = operatorTokens[this.currentChar];
+        }
+        
         this.advance();
         return token;
       }

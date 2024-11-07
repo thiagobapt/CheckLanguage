@@ -4,13 +4,13 @@
                             | <expression> ";"
                             | <if_statement>
                             | <while_statement>
-                            | <function_statement>
                             | <for_statement>
+<initialization>         ::= "var" <name> "=" <expression> ";"
 <assignment>             ::= <name> "=" <expression> ";"
 <if_statement>           ::= "if" "(" <conditional> ")" "{" <statement_list> "}" ["else" "{" <statement_list> "}" ]
 <while_statement>        ::= "while" "(" <conditional> ")" "{" <statement> "}"
 <for_statement>          ::= "for" "(" <assignment> ";" <conditional> ";" <statement> ")" "{" <statement> "}"
-<function_statement>     ::= <name> "(" <parameters> ")" [ ";" ]
+<function>     ::= <name> "(" <parameters> ")" [ ";" ]
 <parameters>             ::= { <expression> | [ "," <expression> ] }
 <expression>             ::= <term> { ("+" | "-") <term> }
 <term>                   ::= <factor> { ("*" | "/") <factor> }
@@ -18,6 +18,7 @@
                             | <name> 
                             | <string>
                             | <boolean>
+                            | <function>
                             | "(" <expression> ")"
 <conditional>            ::= <bool_term> { ("or") <bool_term> }
 <bool_term>              ::= <bool_factor> { ("and") <bool_factor> }

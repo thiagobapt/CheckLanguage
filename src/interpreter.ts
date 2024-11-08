@@ -64,8 +64,12 @@ export function interpretProgram(input: string) {
     // for (const [name, value] of Object.entries(context['variables'])) {
     //   console.log(`${name}: ${JSON.stringify(value)}`);
     // }
+    let finalOutput = "";
+    for(const output of context.getOutput()) {
+      finalOutput = finalOutput + `${output}\n`
+    }
 
-    return astJson;
+    return finalOutput;
   } catch (error: any) {
     console.error("Erro durante a execução:");
     console.error(error);

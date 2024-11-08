@@ -12,7 +12,7 @@ import {interpretProgram} from "../../src/interpreter"
 let parserWithMetadata = parser.configure({
   props: [
     styleTags({
-      Name: t.variableName,
+      Name: t.name,
       Number: t.number,
       Boolean: t.bool,
       String: t.string,
@@ -20,10 +20,15 @@ let parserWithMetadata = parser.configure({
       Assignment: t.definition(t.atom),
       If_Statement: t.controlKeyword,
       Else_Statement: t.controlKeyword,
-      Function_Call: t.bool,
+      While_Statement: t.controlKeyword,
+      For_Statement: t.controlKeyword,
+      Function_Call: t.controlKeyword,
+      Logical_Operator: t.logicOperator,
+      Expression_Operator: t.arithmeticOperator,
+      Term_Operator: t.arithmeticOperator,
       "( )": t.paren,
       "{ }": t.bracket,
-      "=": t.operator
+      "= ; ,": t.operator,
     }),
     indentNodeProp.add({
       Application: context => context.column(context.node.from) + context.unit
@@ -48,6 +53,7 @@ function check() {
   return new LanguageSupport(checkLanguage, [checkCompletion])
 }
 
+
 function App() {
 
   const [text, setText] = useState("");
@@ -65,6 +71,7 @@ function App() {
               let result = "";
               try {
                 result = interpretProgram(text)!;
+                console.group
               } catch (e: any) {
                 result = e;
               }

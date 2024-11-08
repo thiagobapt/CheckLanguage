@@ -6,19 +6,21 @@ Initialization { "var" Name "=" expression ";" }
 
 Assignment { Name "=" expression ";" }
 
-If_Statement { "if" "(" Conditional ")" "{" statement "}" ( "else" "{" statement "}" )? }
+If_Statement { "if" "(" Conditional ")" "{" statement* "}" Else_Statement? }
+
+Else_Statement { "else" "{" statement* "}" }
 
 While_statement { "while" "(" Conditional ")" "{" statement "}" }
 
-For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" statement "}" }
+For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" statement* "}" }
 
 Function_Call { Name "(" parameters ")" }
 
 parameters { expression { "," expression }* }
 
-expression { term ( ("+" | "-") term )? }
+expression { term ( Expression_Operator term )? }
 
-term { factor ( ("*" | "/") factor )? }
+term { factor ( Term_Operator factor )? }
 
 factor { Number | Name | String | Boolean | Function_Call | "(" expression ")" }
 
@@ -26,7 +28,7 @@ Conditional { bool_term ( "or" bool_term )? }
 
 bool_term { bool_factor ( "and" bool_factor )? }
 
-bool_factor { expression ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) expression }
+bool_factor { expression Logical_Operator expression }
 
 @skip { space }
 
@@ -36,9 +38,11 @@ bool_factor { expression ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) expression }
   Boolean { "true" | "false" }
   String { '"' (!["\\] | "\\" _)* '"' }
   space { @whitespace+ }
+  Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
+  Expression_Operator { "+" | "-" }
+  Term_Operator { "*" | "/" }
   @precedence { "if", "else", "for", "while", "var", Boolean, Name }
-
-  "(" ")" "==" "!=" "<" "<=" ">" ">=" "+" "-" "*" "/" "{" "}"
+  "(" ")" "{" "}" "=" ";" ","
 }
 
 @detectDelim

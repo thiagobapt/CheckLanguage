@@ -19,6 +19,7 @@ export function printLn(variables: Variable[]) {
     }
 
     console.log(result);
+    return result;
 }
 
 export function concat(variables: Variable[]) {

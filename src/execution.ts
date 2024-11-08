@@ -20,6 +20,7 @@ import { BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable
 
 export class ExecutionContext {
   private variables: { [key: string]: Variable } = {};
+  private outputs: string[] = [];
 
   public setVariable(name: string, variable: Variable) {
     if (!(name in this.variables)) {
@@ -47,6 +48,14 @@ export class ExecutionContext {
       throw new Error(`Variable "${name}" is not defined.`);
     }
     return this.variables[name];
+  }
+
+  public addOutput(output: string){
+    this.outputs.push(output);
+  }
+
+  public getOutput() {
+    return this.outputs;
   }
 }
 
@@ -151,7 +160,8 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
       if(variableParameters.length < 1) 
         throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
-      printLn(variableParameters);
+      const output = printLn(variableParameters);
+      context.addOutput(output);
 
     } else if(node.value === "concat") {
 

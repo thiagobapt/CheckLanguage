@@ -1,0 +1,44 @@
+@top Program { statement* }
+
+statement {  Assignment | expression ";" | If_Statement | While_statement | For_Statement | Initialization }
+
+Initialization { "var" Name "=" expression ";" }
+
+Assignment { Name "=" expression ";" }
+
+If_Statement { "if" "(" Conditional ")" "{" statement "}" ( "else" "{" statement "}" )? }
+
+While_statement { "while" "(" Conditional ")" "{" statement "}" }
+
+For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" statement "}" }
+
+Function_Call { Name "(" parameters ")" }
+
+parameters { expression { "," expression }* }
+
+expression { term ( ("+" | "-") term )? }
+
+term { factor ( ("*" | "/") factor )? }
+
+factor { Number | Name | String | Boolean | Function_Call | "(" expression ")" }
+
+Conditional { bool_term ( "or" bool_term )? }
+
+bool_term { bool_factor ( "and" bool_factor )? }
+
+bool_factor { expression ( "==" | "!=" | "<" | "<=" | ">" | ">=" ) expression }
+
+@skip { space }
+
+@tokens {
+  Name { $[a-zA-Z]$[a-zA-Z0-9_]* }
+  Number { @digit+ }
+  Boolean { "true" | "false" }
+  String { '"' (!["\\] | "\\" _)* '"' }
+  space { @whitespace+ }
+  @precedence { "if", "else", "for", "while", "var", Boolean, Name }
+
+  "(" ")" "==" "!=" "<" "<=" ">" ">=" "+" "-" "*" "/" "{" "}"
+}
+
+@detectDelim

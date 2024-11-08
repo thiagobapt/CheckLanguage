@@ -10,7 +10,7 @@
 <if_statement>           ::= "if" "(" <conditional> ")" "{" <statement_list> "}" ["else" "{" <statement_list> "}" ]
 <while_statement>        ::= "while" "(" <conditional> ")" "{" <statement> "}"
 <for_statement>          ::= "for" "(" <assignment> ";" <conditional> ";" <statement> ")" "{" <statement> "}"
-<function>     ::= <name> "(" <parameters> ")" [ ";" ]
+<function>               ::= <name> "(" <parameters> ")" [ ";" ]
 <parameters>             ::= { <expression> | [ "," <expression> ] }
 <expression>             ::= <term> { ("+" | "-") <term> }
 <term>                   ::= <factor> { ("*" | "/") <factor> }

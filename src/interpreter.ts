@@ -66,8 +66,9 @@ export function interpretProgram(input: string) {
     // }
 
     return astJson;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro durante a execução:");
     console.error(error);
+    throw new Error(error)
   }
 }

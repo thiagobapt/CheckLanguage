@@ -7,6 +7,7 @@ import {parser} from "./CheckLang"
 import {foldNodeProp, foldInside, indentNodeProp} from "@codemirror/language"
 import {styleTags, tags as t} from "@lezer/highlight"
 import {LanguageSupport} from "@codemirror/language"
+import {interpretProgram} from "../../src/interpreter"
 
 let parserWithMetadata = parser.configure({
   props: [
@@ -50,11 +51,28 @@ function check() {
 function App() {
 
   const [text, setText] = useState("");
+  const [output, setOutput] = useState("");
 
   return (
     <>
-      <div className="w-full h-screen">
-        <ReactCodeMirror height="full" value={text} theme={vscodeDark} extensions={[check()]}/>
+      <div className="w-screen h-screen">
+        <div className="h-3/5 overflow-auto">
+          <ReactCodeMirror value={text} onChange={(e) => {setText(e)}} theme={vscodeDark} extensions={[check()]}/>
+        </div>
+        <div className="h-2/5 p-1 w-screen flex flex-col place-content-center space-y-1 overflow-hidden">
+          <div className="flex place-content-center">
+            <button className="h-fit w-fit hover:bg-slate-800 focus:outline-none" onClick={() => {
+              let result = "";
+              try {
+                result = interpretProgram(text)!;
+              } catch (e: any) {
+                result = e;
+              }
+              setOutput(result);
+            }}>Rodar</button>
+          </div>
+          <textarea className="w-full h-full disabled:bg-stone-900" value={output} disabled></textarea>
+        </div>
       </div>
     </>
   )

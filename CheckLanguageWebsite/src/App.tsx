@@ -22,7 +22,7 @@ let parserWithMetadata = parser.configure({
       Else_Statement: t.controlKeyword,
       While_Statement: t.controlKeyword,
       For_Statement: t.controlKeyword,
-      Function_Call: t.controlKeyword,
+      "Function_Call/Name": t.function(t.attributeName),
       Logical_Operator: t.logicOperator,
       Expression_Operator: t.arithmeticOperator,
       Term_Operator: t.arithmeticOperator,

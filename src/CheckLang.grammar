@@ -1,6 +1,6 @@
 @top Program { statement* }
 
-statement {  Assignment | expression ";" | If_Statement | While_statement | For_Statement | Initialization }
+statement {  Assignment | expression ";" | If_Statement | While_Statement | For_Statement | Initialization }
 
 Initialization { "var" Name "=" expression ";" }
 
@@ -10,7 +10,7 @@ If_Statement { "if" "(" Conditional ")" "{" statement* "}" Else_Statement? }
 
 Else_Statement { "else" "{" statement* "}" }
 
-While_statement { "while" "(" Conditional ")" "{" statement "}" }
+While_Statement { "while" "(" Conditional ")" "{" statement "}" }
 
 For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" statement* "}" }
 
@@ -41,7 +41,7 @@ bool_factor { expression Logical_Operator expression }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
   Term_Operator { "*" | "/" }
-  @precedence { "if", "else", "for", "while", "var", Boolean, Name }
+  @precedence { "while", "if", "else", "for", "var", Boolean, Name }
   "(" ")" "{" "}" "=" ";" ","
 }
 

@@ -13,6 +13,6 @@ export const
   Conditional = 16,
   Logical_Operator = 17,
   Else_Statement = 20,
-  While_statement = 21,
+  While_Statement = 21,
   For_Statement = 22,
   Initialization = 23

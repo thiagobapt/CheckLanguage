@@ -8,9 +8,9 @@ export enum VariableType {
 export class NumberVariable {
     public name: string;
     public type: VariableType.Number = VariableType.Number;
-    public value: number;
+    public value: number | undefined;
 
-    constructor(value: number, name: string = "") {
+    constructor(value: number | undefined, name: string = "") {
         this.name = name;
         this.value = value;
     }
@@ -19,9 +19,9 @@ export class NumberVariable {
 export class StringVariable {
     public name: string;
     public type: VariableType.String = VariableType.String;
-    public value: string;
+    public value: string | undefined;
 
-    constructor(value: string, name: string = "") {
+    constructor(value: string | undefined, name: string = "") {
         this.name = name;
         this.value = value;
     }
@@ -30,9 +30,9 @@ export class StringVariable {
 export class BooleanVariable {
     public name: string;
     public type: VariableType.Boolean = VariableType.Boolean;
-    public value: boolean;
+    public value: boolean | undefined;
 
-    constructor(value: boolean, name: string = "") {
+    constructor(value: boolean | undefined, name: string = "") {
         this.name = name;
         this.value = value;
     }

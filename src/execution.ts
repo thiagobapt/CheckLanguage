@@ -12,15 +12,25 @@ import {
   InitializationNode,
   StringNode,
   BooleanNode,
+  FunctionCallNode,
   FunctionNode,
+  ReturnNode,
 } from "./ast-nodes";
-import { concat, printLn } from "./functions";
+import { FunctionVariable, concat, printLn } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
 import { BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class ExecutionContext {
   private variables: { [key: string]: Variable } = {};
+  private functions: { [key: string]: FunctionVariable } = {};
   private outputs: string[] = [];
+
+  constructor(context?: ExecutionContext) {
+    if(context) {
+      this.variables = context.variables;
+      this.functions = context.functions;
+    }
+  }
 
   public setVariable(name: string, variable: Variable) {
     if (!(name in this.variables)) {
@@ -50,8 +60,19 @@ export class ExecutionContext {
     return this.variables[name];
   }
 
+  public getFunction(name: string): FunctionVariable {
+    if (!(name in this.functions)) {
+      throw new Error(`Function "${name}" is not defined.`);
+    }
+    return this.functions[name];
+  }
+
   public addOutput(output: string){
     this.outputs.push(output);
+  }
+
+  public addOutputs(outputs: string[]){
+    for(const output of outputs) this.outputs.push(output);
   }
 
   public getOutput() {
@@ -150,6 +171,30 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     return new NullVariable();
 
   } else if (node instanceof FunctionNode) {
+
+    for(const param of node.parameters) {
+      
+      context.initializeVariable(param.name.value, param.value);
+    }
+
+    let returnValue: Variable = new NullVariable();
+
+    for(const execNode of node.executeBranch) {
+      if(execNode instanceof ReturnNode) {
+        returnValue = executeAST(execNode, context);
+        break;
+      } else {
+        executeAST(execNode, context);
+      }
+    }
+
+    for(const param of node.parameters) {
+      context.deleteVariable(param.name.value);
+    }
+
+    return returnValue;
+
+  } else if (node instanceof FunctionCallNode) {
     const variableParameters: Variable[] = [];
 
     for(const parameter of node.parameters) {
@@ -170,7 +215,21 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       return concat(variableParameters);
 
     } else {
-      throw new Error(`Function ${node.value} is not defined.`)
+      const func = context.getFunction(node.value);
+      let i = 0;
+
+      for(const param of func.value.parameters) {
+        if(variableParameters[i].type != param.param_type) {
+          throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.value} expected type ${param.type}, received ${variableParameters[i].type}`);
+        }
+        i++;
+        return executeAST(func.value, context);
+      }
+
+      if(variableParameters.length < func.parameterCount) 
+        throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
+      return concat(variableParameters);
+
     }
 
     return new NullVariable();

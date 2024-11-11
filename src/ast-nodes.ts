@@ -1,3 +1,5 @@
+import { Variable, VariableType } from "./variables";
+
 // arquivo: ast-nodes.ts
 export interface ASTNode {
     type: string;
@@ -48,7 +50,15 @@ export interface ASTNode {
     type = "Name";
   }
 
-  export class FunctionNode implements ASTNode {
+  export class ReturnNode implements ASTNode {
+    id: number;
+    constructor(public value: string) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Return";
+  }
+
+  export class FunctionCallNode implements ASTNode {
     id: number;
     constructor(
       public value: string,
@@ -56,7 +66,41 @@ export interface ASTNode {
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
+    type = "FunctionCall";
+  }
+
+  export class ParameterDeclarationNode implements ASTNode {
+    id: number;
+    constructor(
+      public value: Variable,
+      public name: NameNode,
+      public param_type: VariableType
+    ) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "ParameterDeclaration";
+  }
+
+  export class FunctionNode implements ASTNode {
+    id: number;
+    constructor(
+      public value: string,
+      public parameters: ParameterDeclarationNode[],
+      public executeBranch: ASTNode[]
+    ) {
+      this.id = ASTNodeCounter.getNextId();
+    }
     type = "Function";
+  }
+
+  export class FunctionDeclarationNode implements ASTNode {
+    id: number;
+    constructor(
+      public value: ASTNode
+    ) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "FunctionDeclaration";
   }
 
   export class InitializationNode implements ASTNode {

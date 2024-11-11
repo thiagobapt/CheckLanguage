@@ -30,7 +30,9 @@ export enum TokenType {
   While = "WHILE",
   For = "FOR",
   Var = "VAR",
-  Function = "FUNCTION"
+  Function = "FUNCTION",
+  FunctionDeclaration = "FUNCTION_DECLARATION",
+  Type = "TYPE"
 }
 
 export class Token {
@@ -92,6 +94,15 @@ export class Lexer {
       return new Token(TokenType.Boolean, result); // implementação do Boolean
     }
 
+    if (
+      result === "string" ||
+      result === "number" ||
+      result === "bool"
+    ) {
+      this.previousTokenType = TokenType.Type;
+      return new Token(TokenType.Type, result); // implementação do Types
+    }
+
     if (result === "if") {
       this.previousTokenType = TokenType.If;
       return new Token(TokenType.If, result);     // implementação do IF
@@ -112,6 +123,15 @@ export class Lexer {
     if (result === "var") {
       this.previousTokenType = TokenType.Var;
       return new Token(TokenType.Var, result); // implementação de inicialização
+    }
+    if (result === "function") {
+      this.previousTokenType = TokenType.FunctionDeclaration;
+      return new Token(TokenType.FunctionDeclaration, result); // implementação de declaração de funções
+    }
+
+    if(this.previousTokenType === TokenType.FunctionDeclaration) {
+      this.previousTokenType = TokenType.Name;
+      return new Token(TokenType.Name, result);
     }
 
     if (this.lookAhead().type === TokenType.LeftParen) {

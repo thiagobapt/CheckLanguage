@@ -1,6 +1,7 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode } from "./ast-nodes";
+import { BooleanVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class Parser {
   private currentToken!: Token;
@@ -114,7 +115,7 @@ export class Parser {
     this.eat(TokenType.RightParen);
 
     this.eat(TokenType.LeftBracket);
-    const doBranch: ASTNode[] = this.statement_list();;
+    const doBranch: ASTNode[] = this.statement_list();
     this.eat(TokenType.RightBracket);
 
     return new ForNode(index, condition, endStatement, doBranch);
@@ -137,7 +138,7 @@ export class Parser {
       const parameters = this.parameters();
       this.eat(TokenType.RightParen);
 
-      return new FunctionNode(token.value, parameters);
+      return new FunctionCallNode(token.value, parameters);
 
     } else if (token.type === TokenType.Quotation) {
 
@@ -205,6 +206,45 @@ export class Parser {
     return expressions;
   }
 
+  private parameters_declaration(): ParameterDeclarationNode[] {
+    const params: ParameterDeclarationNode[] = [];
+    while(
+      this.currentToken.type == TokenType.Name ||
+      this.currentToken.type == TokenType.Type ||
+      this.currentToken.type == TokenType.Comma
+    ) {
+      const type = this.currentToken.value;
+      if(this.currentToken.type === TokenType.Type) this.eat(TokenType.Type);
+      let paramType: VariableType;
+      let variable: Variable;
+      switch(type) {
+        case "string": {
+          paramType = VariableType.String;
+          variable = new StringVariable(undefined);
+          break;
+        }
+        case "number": {
+          paramType = VariableType.Number;
+          variable = new NumberVariable(undefined);
+          break;
+        }
+        case "boolean": {
+          paramType = VariableType.Boolean;
+          variable = new BooleanVariable(undefined);
+          break;
+        }
+        default: {
+          throw new Error("Invalid type");
+        }
+      }
+      const name = this.currentToken.value;
+      if(this.currentToken.type === TokenType.Name) this.eat(TokenType.Name);
+      if(this.currentToken.type === TokenType.Comma) this.eat(TokenType.Comma);
+      params.push(new ParameterDeclarationNode(variable, new NameNode(name), paramType));
+    }
+    return params;
+  }
+
   private assignment(): ASTNode {
     const variableToken = this.currentToken;
     this.eat(TokenType.Name);
@@ -222,6 +262,17 @@ export class Parser {
     const exprNode = this.expr();
     this.eat(TokenType.Semicolon);
     return new InitializationNode(new NameNode(variableToken.value), exprNode);
+  }
+
+  private functionDeclaration(): ASTNode {
+    this.eat(TokenType.FunctionDeclaration);
+    const variableToken = this.currentToken;
+    this.eat(TokenType.Name);
+    const parameters = this.parameters_declaration()
+    this.eat(TokenType.LeftBracket);
+    const execBranch: ASTNode[] = this.statement_list();
+    this.eat(TokenType.RightBracket);
+    return new FunctionDeclarationNode(new FunctionNode(variableToken.value, parameters, execBranch));
   }
 
   public statement_list(): ASTNode[] {
@@ -245,6 +296,9 @@ export class Parser {
       return this.whileStatement();
     } else if (this.currentToken.type === TokenType.For) {
       return this.forStatement();
+    }
+    if(this.currentToken.type === TokenType.FunctionDeclaration) {
+      return this.functionDeclaration();
     }
     else if (this.currentToken.type === TokenType.Name) {
       const nextToken = this.lexer.lookAhead();

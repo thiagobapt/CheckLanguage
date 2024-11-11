@@ -1,6 +1,6 @@
 @top Program { statement* }
 
-statement {  Assignment | expression ";" | If_Statement | While_Statement | For_Statement | Initialization }
+statement {  Assignment | expression ";" | If_Statement | While_Statement | For_Statement | Initialization | Function_Declaration }
 
 Initialization { "var" Name "=" expression ";" }
 
@@ -16,7 +16,11 @@ For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" state
 
 Function_Call { Name "(" parameters ")" }
 
-parameters { expression { "," expression }* }
+Function_Declaration { "function" Name "(" Parameter_Declaration ")" "{" statement* "}" }
+
+parameters { expression ( "," expression )* }
+
+Parameter_Declaration { Types Name ( "," Types Name )* }
 
 expression { term ( Expression_Operator term )? }
 
@@ -41,7 +45,8 @@ bool_factor { expression Logical_Operator expression }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
   Term_Operator { "*" | "/" }
-  @precedence { "while", "if", "else", "for", "var", Boolean, Name }
+  Types { "string" | "number" | "bool" }
+  @precedence { "while", "if", "else", "for", "var", "function", Boolean, Name }
   "(" ")" "{" "}" "=" ";" ","
 }
 

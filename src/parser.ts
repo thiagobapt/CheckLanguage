@@ -12,6 +12,7 @@ export class Parser {
 
   private eat(tokenType: TokenType): void {
     if (this.currentToken.type === tokenType) {
+      this.lexer.setPreviousTokenType(tokenType);
       this.currentToken = this.lexer.getNextToken();
     } else {
       throw new Error(
@@ -144,7 +145,7 @@ export class Parser {
 
       this.eat(TokenType.Quotation);
       const node = this.factor();
-      this.eat(TokenType.Quotation);
+      this.eat(TokenType.CloseQuotation);
 
       return node;
 
@@ -266,13 +267,15 @@ export class Parser {
 
   private functionDeclaration(): ASTNode {
     this.eat(TokenType.FunctionDeclaration);
-    const variableToken = this.currentToken;
+    const nameToken = this.currentToken;
     this.eat(TokenType.Name);
-    const parameters = this.parameters_declaration()
+    this.eat(TokenType.LeftParen);
+    const parameters = this.parameters_declaration();
+    this.eat(TokenType.RightParen);
     this.eat(TokenType.LeftBracket);
     const execBranch: ASTNode[] = this.statement_list();
     this.eat(TokenType.RightBracket);
-    return new FunctionDeclarationNode(new FunctionNode(variableToken.value, parameters, execBranch));
+    return new FunctionDeclarationNode(new FunctionNode(nameToken.value, parameters, execBranch));
   }
 
   public statement_list(): ASTNode[] {
@@ -297,7 +300,7 @@ export class Parser {
     } else if (this.currentToken.type === TokenType.For) {
       return this.forStatement();
     }
-    if(this.currentToken.type === TokenType.FunctionDeclaration) {
+    else if(this.currentToken.type === TokenType.FunctionDeclaration) {
       return this.functionDeclaration();
     }
     else if (this.currentToken.type === TokenType.Name) {

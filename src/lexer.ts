@@ -48,6 +48,10 @@ export class Lexer {
     this.currentChar = input.length > 0 ? input[0] : null;
   }
 
+  public setPreviousTokenType(type: TokenType) {
+    this.previousTokenType = type;
+  }
+
   private advance() {
     this.position++;
     return this.currentChar = this.position < this.input.length ? this.input[this.position] : null;
@@ -99,47 +103,37 @@ export class Lexer {
       result === "number" ||
       result === "bool"
     ) {
-      this.previousTokenType = TokenType.Type;
       return new Token(TokenType.Type, result); // implementação do Types
     }
 
     if (result === "if") {
-      this.previousTokenType = TokenType.If;
       return new Token(TokenType.If, result);     // implementação do IF
     }
     if (result === "else"){
-      this.previousTokenType = TokenType.Else;
       return new Token(TokenType.Else, result); // implementação do Else
     }
 
     if (result === "while") {
-      this.previousTokenType = TokenType.While;
       return new Token(TokenType.While, result); // implementação do While
     }
     if (result === "for") {
-      this.previousTokenType = TokenType.For;
       return new Token(TokenType.For, result); // implementação do For
     }
     if (result === "var") {
-      this.previousTokenType = TokenType.Var;
       return new Token(TokenType.Var, result); // implementação de inicialização
     }
     if (result === "function") {
-      this.previousTokenType = TokenType.FunctionDeclaration;
       return new Token(TokenType.FunctionDeclaration, result); // implementação de declaração de funções
     }
 
     if(this.previousTokenType === TokenType.FunctionDeclaration) {
-      this.previousTokenType = TokenType.Name;
       return new Token(TokenType.Name, result);
     }
 
     if (this.lookAhead().type === TokenType.LeftParen) {
-      this.previousTokenType = TokenType.Function;
       return new Token(TokenType.Function, result);
     }
     
-    this.previousTokenType = TokenType.Name;
     return new Token(TokenType.Name, result);
   }
 
@@ -183,10 +177,8 @@ export class Lexer {
         // Implementação da igualdade 
         if (this.currentChar === "=") {
           this.advance();
-          this.previousTokenType = TokenType.EqualsEquals;
           return new Token(TokenType.EqualsEquals, "==");
         }
-        this.previousTokenType = TokenType.Equals;
         return new Token(TokenType.Equals, "=");
       }
 
@@ -194,7 +186,6 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
-          this.previousTokenType = TokenType.NotEquals;
           return new Token(TokenType.NotEquals, "!=");
         }
       }
@@ -203,10 +194,8 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
-          this.previousTokenType = TokenType.LessThanOrEquals;
           return new Token(TokenType.LessThanOrEquals, "<=");
         }
-        this.previousTokenType = TokenType.LessThan;
         return new Token(TokenType.LessThan, "<");
       }
 
@@ -214,21 +203,22 @@ export class Lexer {
         const nextChar = this.advance();
         if (nextChar === "=") {
           this.advance();
-          this.previousTokenType = TokenType.MoreThanOrEquals;
           return new Token(TokenType.MoreThanOrEquals, ">=");
         }
-        this.previousTokenType = TokenType.MoreThan;
         return new Token(TokenType.MoreThan, ">");
       }
 
       if (operatorTokens[this.currentChar]) {
-        const token = new Token(
+        let token = new Token(
           operatorTokens[this.currentChar],
           this.currentChar
         );
 
         if(this.previousTokenType === TokenType.String && operatorTokens[this.currentChar] === TokenType.Quotation) {
-          this.previousTokenType = TokenType.CloseQuotation;
+          token = new Token(
+            TokenType.CloseQuotation,
+            this.currentChar
+          );
         } else {
           this.previousTokenType = operatorTokens[this.currentChar];
         }

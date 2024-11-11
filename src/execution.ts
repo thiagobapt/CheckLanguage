@@ -15,6 +15,8 @@ import {
   FunctionCallNode,
   FunctionNode,
   ReturnNode,
+  ParameterDeclarationNode,
+  FunctionDeclarationNode,
 } from "./ast-nodes";
 import { FunctionVariable, concat, printLn } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
@@ -67,6 +69,13 @@ export class ExecutionContext {
     return this.functions[name];
   }
 
+  public initializeFunction(name: string, func: FunctionVariable) {
+    if ((name in this.functions)) {
+      throw new Error(`Function "${name}" was already initialized.`);
+    }
+    this.functions[name] = func;
+  }
+
   public addOutput(output: string){
     this.outputs.push(output);
   }
@@ -81,7 +90,6 @@ export class ExecutionContext {
 }
 
 export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
-
   if (node instanceof BinaryOpNode) {
 
     const left = executeAST(node.left, context);
@@ -109,6 +117,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     return context.getVariable(node.value);
 
   } else if (node instanceof AssignmentNode) {
+    console.log("here")
 
     const value = executeAST(node.value, context);
     value.name = node.name.value;
@@ -172,11 +181,6 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
   } else if (node instanceof FunctionNode) {
 
-    for(const param of node.parameters) {
-      
-      context.initializeVariable(param.name.value, param.value);
-    }
-
     let returnValue: Variable = new NullVariable();
 
     for(const execNode of node.executeBranch) {
@@ -216,20 +220,22 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
     } else {
       const func = context.getFunction(node.value);
+
       let i = 0;
 
       for(const param of func.value.parameters) {
         if(variableParameters[i].type != param.param_type) {
-          throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.value} expected type ${param.type}, received ${variableParameters[i].type}`);
+          throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.name.value} expected type ${param.value.type}, received ${variableParameters[i].type}`);
         }
+        context.initializeVariable(param.name.value, variableParameters[i]);
         i++;
-        return executeAST(func.value, context);
       }
+      
 
-      if(variableParameters.length < func.parameterCount) 
+      if(variableParameters.length != func.parameterCount) 
         throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
-      return concat(variableParameters);
 
+      return executeAST(func.value, context);
     }
 
     return new NullVariable();
@@ -242,7 +248,20 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     const right = executeAST(node.right, context);
     return evaluateCondition(node.operator, left, right);
 
-  } 
+  }
+
+  else if (node instanceof FunctionDeclarationNode) {
+    const func = new FunctionVariable(node.value.value, node.value);
+    context.initializeFunction(node.value.value, func);
+    return new NullVariable();
+
+  }
+
+  else if (node instanceof ParameterDeclarationNode) {
+
+    return new NullVariable();
+
+  }
 
   throw new Error(`Unsupported AST node: ${JSON.stringify(node, null, 4)}`);
 }

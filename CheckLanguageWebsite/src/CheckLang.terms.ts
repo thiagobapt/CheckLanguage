@@ -15,4 +15,7 @@ export const
   Else_Statement = 20,
   While_Statement = 21,
   For_Statement = 22,
-  Initialization = 23
+  Initialization = 23,
+  Function_Declaration = 24,
+  Parameter_Declaration = 25,
+  Types = 26

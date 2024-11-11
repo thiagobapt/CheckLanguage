@@ -96,7 +96,7 @@ export interface ASTNode {
   export class FunctionDeclarationNode implements ASTNode {
     id: number;
     constructor(
-      public value: ASTNode
+      public value: FunctionNode
     ) {
       this.id = ASTNodeCounter.getNextId();
     }

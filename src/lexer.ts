@@ -32,7 +32,10 @@ export enum TokenType {
   Var = "VAR",
   Function = "FUNCTION",
   FunctionDeclaration = "FUNCTION_DECLARATION",
-  Type = "TYPE"
+  Type = "TYPE",
+  Return = "RETURN",
+  CommentStart = "/*",
+  CommentEnd = "*/"
 }
 
 export class Token {
@@ -59,6 +62,15 @@ export class Lexer {
 
   private skipWhitespace(): void {
     while (this.currentChar !== null && /\s/.test(this.currentChar)) {
+      this.advance();
+    }
+  }
+
+  private skipComment() {
+    while(true) {
+      if(this.currentChar === "*") {
+        if(this.advance() === "/") break;
+      }
       this.advance();
     }
   }
@@ -106,6 +118,9 @@ export class Lexer {
       return new Token(TokenType.Type, result); // implementação do Types
     }
 
+    if (result === "return") {
+      return new Token(TokenType.Return, result);     // implementação do Return
+    }
     if (result === "if") {
       return new Token(TokenType.If, result);     // implementação do IF
     }
@@ -157,6 +172,11 @@ export class Lexer {
 
       if (this.previousTokenType === TokenType.Quotation) {
         return this.name();
+      }
+
+      if(this.currentChar === "/") {
+        if(this.advance() === "*") this.skipComment();
+        continue;
       }
 
       if (/\s/.test(this.currentChar)) {

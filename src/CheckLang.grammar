@@ -51,7 +51,7 @@ bool_factor { expression Logical_Operator expression }
   Comment { "/*" (![*/])*  "*/" }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
-  Term_Operator { "*" | "/" }
+  Term_Operator { "*" | "/" | "%" }
   Types { "string" | "number" | "bool" }
   @precedence { "while", "if", "else", "for", "var", "function", "return", Boolean, Name }
   "(" ")" "{" "}" "=" ";" "," "/*" "*/"

@@ -1,6 +1,6 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode, ReturnNode } from "./ast-nodes";
 import { BooleanVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class Parser {
@@ -199,6 +199,7 @@ export class Parser {
       this.currentToken.type == TokenType.Quotation ||
       this.currentToken.type == TokenType.CloseQuotation ||
       this.currentToken.type == TokenType.Boolean ||
+      this.currentToken.type == TokenType.Function ||
       this.currentToken.type == TokenType.Comma
     ) {
       if(this.currentToken.type === TokenType.Comma) this.eat(TokenType.Comma);
@@ -265,6 +266,13 @@ export class Parser {
     return new InitializationNode(new NameNode(variableToken.value), exprNode);
   }
 
+  private return_statement(): ASTNode {
+    this.eat(TokenType.Return);
+    const exprNode = this.expr();
+    this.eat(TokenType.Semicolon);
+    return new ReturnNode(exprNode);
+  }
+
   private functionDeclaration(): ASTNode {
     this.eat(TokenType.FunctionDeclaration);
     const nameToken = this.currentToken;
@@ -280,13 +288,20 @@ export class Parser {
 
   public statement_list(): ASTNode[] {
     const statements: ASTNode[] = [];
+    let hasReturnStatement = false;
     while(
       this.currentToken.type == TokenType.If ||
       this.currentToken.type == TokenType.While ||
       this.currentToken.type == TokenType.For ||
       this.currentToken.type == TokenType.Name ||
-      this.currentToken.type == TokenType.Function
+      this.currentToken.type == TokenType.Function ||
+      this.currentToken.type == TokenType.Var ||
+      this.currentToken.type == TokenType.FunctionDeclaration ||
+      this.currentToken.type == TokenType.Return
+      
     ) {
+      if(hasReturnStatement) throw new Error(`${this.currentToken.value} is unreacheable!`);
+      if(this.currentToken.type === TokenType.Return) hasReturnStatement = true;
       statements.push(this.statement());
     }
     return statements;
@@ -311,6 +326,9 @@ export class Parser {
     }
     else if (this.currentToken.type === TokenType.Var) {
       return this.initialization();
+    }
+    else if (this.currentToken.type === TokenType.Return) {
+      return this.return_statement();
     }
     return this.expr();
   }

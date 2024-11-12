@@ -22,13 +22,16 @@ let parserWithMetadata = parser.configure({
       Else_Statement: t.controlKeyword,
       While_Statement: t.controlKeyword,
       For_Statement: t.controlKeyword,
+      Return_Statement: t.controlKeyword,
+      "Function_Call/Parameter": t.name,
       "Function_Call/Name": t.function(t.attributeName),
-      Function_Declaration: t.definition(t.atom),
+      "Function_Declaration": t.definition(t.atom),
       "Function_Declaration/Name": t.function(t.attributeName),
       "Parameter_Declaration/Types": t.atom,
       Logical_Operator: t.logicOperator,
       Expression_Operator: t.arithmeticOperator,
       Term_Operator: t.arithmeticOperator,
+      Comment: t.comment,
       "( )": t.paren,
       "{ }": t.bracket,
       "= ; ,": t.operator,
@@ -49,6 +52,16 @@ const checkLanguage = LRLanguage.define({
 const checkCompletion = checkLanguage.data.of({
   autocomplete: completeFromList([
     {label: "var", type: "keyword"},
+    {label: "if", type: "keyword"},
+    {label: "else", type: "keyword"},
+    {label: "function", type: "keyword"},
+    {label: "while", type: "keyword"},
+    {label: "return", type: "keyword"},
+    {label: "string", type: "type"},
+    {label: "number", type: "type"},
+    {label: "bool", type: "type"},
+    {label: "printLn", type: "function"},
+    {label: "concat", type: "function"},
   ])
 })
 
@@ -59,7 +72,23 @@ function check() {
 
 function App() {
 
-  const [text, setText] = useState("");
+  const [text, setText] = useState(`/* 
+This is a demonstration of the Check Language with the recursive function "fibonacci" that return the fibonacci sequence.
+*/
+
+printLn("Fibonacci sequence: ")
+
+function fibonacci(number previousValue, number currentValue) {
+  if(currentValue < 100) { 
+    var novoValor = currentValue + previousValue;
+    printLn(currentValue)
+    return fibonacci(currentValue, novoValor);
+  } else {
+    return currentValue;
+  }
+}
+
+printLn(fibonacci(0, 1))`);
   const [output, setOutput] = useState("");
 
   return (

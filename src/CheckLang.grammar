@@ -1,24 +1,28 @@
 @top Program { statement* }
 
-statement {  Assignment | expression ";" | If_Statement | While_Statement | For_Statement | Initialization | Function_Declaration }
+statement {  Assignment | expression ";" | If_Statement | While_Statement | For_Statement | Initialization | Function_Declaration | Return_Statement }
 
 Initialization { "var" Name "=" expression ";" }
 
 Assignment { Name "=" expression ";" }
 
-If_Statement { "if" "(" Conditional ")" "{" statement* "}" Else_Statement? }
+If_Statement { "if" "(" Conditional ")" Statement_List Else_Statement? }
 
-Else_Statement { "else" "{" statement* "}" }
+Else_Statement { "else" Statement_List }
 
 While_Statement { "while" "(" Conditional ")" "{" statement "}" }
 
-For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" "{" statement* "}" }
+For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" Statement_List }
 
-Function_Call { Name "(" parameters ")" }
+Return_Statement { "return" expression ";" }
 
-Function_Declaration { "function" Name "(" Parameter_Declaration ")" "{" statement* "}" }
+Function_Call { Name "(" Parameter ")" }
 
-parameters { expression ( "," expression )* }
+Function_Declaration { "function" Name "(" Parameter_Declaration ")" Statement_List }
+
+Statement_List { "{" statement* "}" }
+
+Parameter { expression ( "," expression )* }
 
 Parameter_Declaration { Types Name ( "," Types Name )* }
 
@@ -34,20 +38,23 @@ bool_term { bool_factor ( "and" bool_factor )? }
 
 bool_factor { expression Logical_Operator expression }
 
-@skip { space }
+@skip { 
+  space | Comment
+}
 
 @tokens {
   Name { $[a-zA-Z]$[a-zA-Z0-9_]* }
   Number { @digit+ }
   Boolean { "true" | "false" }
-  String { '"' (!["\\] | "\\" _)* '"' }
+  String { '"' (!["])* '"' }
   space { @whitespace+ }
+  Comment { "/*" (![*/])*  "*/" }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
   Term_Operator { "*" | "/" }
   Types { "string" | "number" | "bool" }
-  @precedence { "while", "if", "else", "for", "var", "function", Boolean, Name }
-  "(" ")" "{" "}" "=" ";" ","
+  @precedence { "while", "if", "else", "for", "var", "function", "return", Boolean, Name }
+  "(" ")" "{" "}" "=" ";" "," "/*" "*/"
 }
 
 @detectDelim

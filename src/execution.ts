@@ -26,22 +26,34 @@ export class ExecutionContext {
   private variables: { [key: string]: Variable } = {};
   private functions: { [key: string]: FunctionVariable } = {};
   private outputs: string[] = [];
+  private scope?: ExecutionContext;
 
   constructor(context?: ExecutionContext) {
     if(context) {
-      this.variables = context.variables;
-      this.functions = context.functions;
+      this.scope = context;
     }
   }
 
+  public newScope(): ExecutionContext {
+    const newScope = new ExecutionContext(this);
+    return newScope;
+  }
+
   public setVariable(name: string, variable: Variable) {
+
     if (!(name in this.variables)) {
-      throw new Error(`Variable "${name}" is not defined.`);
+      if(this.scope) {
+        this.scope.setVariable(name, variable);
+      } else {
+        throw new Error(`Variable "${name}" is not defined.`);
+      }
     }
+
     if(this.variables[name].type !== variable.type) {
       throw new Error(`Variable "${name}" (${this.variables[name].type}) is not of type ${variable.type}.`);
     }
     this.variables[name] = variable;
+    
   }
 
   public initializeVariable(name: string, variable: Variable) {
@@ -57,14 +69,22 @@ export class ExecutionContext {
 
   public getVariable(name: string): Variable {
     if (!(name in this.variables)) {
-      throw new Error(`Variable "${name}" is not defined.`);
+      if(this.scope) {
+        return this.scope.getVariable(name);
+      } else {
+        throw new Error(`Variable "${name}" is not defined.`);
+      }
     }
     return this.variables[name];
   }
 
   public getFunction(name: string): FunctionVariable {
     if (!(name in this.functions)) {
-      throw new Error(`Function "${name}" is not defined.`);
+      if(this.scope) {
+        return this.scope.getFunction(name);
+      } else {
+        throw new Error(`Function "${name}" is not defined.`);
+      }
     }
     return this.functions[name];
   }
@@ -76,8 +96,12 @@ export class ExecutionContext {
     this.functions[name] = func;
   }
 
-  public addOutput(output: string){
-    this.outputs.push(output);
+  public addOutput(output: string) {
+    if(!this.scope) {
+      this.outputs.push(output);
+    } else {
+      this.scope.addOutput(output);
+    }
   }
 
   public addOutputs(outputs: string[]){
@@ -117,7 +141,6 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     return context.getVariable(node.value);
 
   } else if (node instanceof AssignmentNode) {
-    console.log("here")
 
     const value = executeAST(node.value, context);
     value.name = node.name.value;
@@ -132,12 +155,14 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     return value;
 
   } else if (node instanceof IfNode) {
+    const newContext = context.newScope();
 
-    const conditionResult = executeAST(node.condition, context);
+    const conditionResult = executeAST(node.condition, newContext);
     if (conditionResult.value) {
 
       for(const thenNode of node.thenBranch) {
-        executeAST(thenNode, context);
+        if(thenNode instanceof ReturnNode) return executeAST(thenNode, newContext);
+        executeAST(thenNode, newContext);
       }
 
       return new NullVariable();
@@ -145,7 +170,8 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     } else if (node.elseBranch) {
 
       for(const elseNode of node.elseBranch) {
-        executeAST(elseNode, context);
+        if(elseNode instanceof ReturnNode) return executeAST(elseNode, newContext);
+        executeAST(elseNode, newContext);
       }
 
       return new NullVariable();
@@ -153,56 +179,71 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
   } else if (node instanceof WhileNode) {
 
-    let conditionResult: BooleanVariable = executeAST(node.condition, context) as BooleanVariable;
+    const newContext = context.newScope();
+
+    let conditionResult: BooleanVariable = executeAST(node.condition, newContext) as BooleanVariable;
 
     while (conditionResult.value) {
       for(const doNode of node.doBranch) {
-        executeAST(doNode, context)
+        if(doNode instanceof ReturnNode) return executeAST(doNode, newContext);
+        executeAST(doNode, newContext)
       }
-      conditionResult = executeAST(node.condition, context) as BooleanVariable;
+      conditionResult = executeAST(node.condition, newContext) as BooleanVariable;
       if(!conditionResult.value) return new NullVariable();
     }
 
   } else if (node instanceof ForNode) {
 
-    executeAST(node.index, context);
+    const newContext = context.newScope();
 
-    let conditionResult: BooleanVariable = executeAST(node.condition, context) as BooleanVariable;
+    executeAST(node.index, newContext);
+
+    let conditionResult: BooleanVariable = executeAST(node.condition, newContext) as BooleanVariable;
 
     while (conditionResult.value) {
       for(const doNode of node.doBranch) {
-        executeAST(doNode, context)
+        if(doNode instanceof ReturnNode) return executeAST(doNode, newContext);
+        executeAST(doNode, newContext)
       }
-      executeAST(node.endStatement, context);
-      conditionResult = executeAST(node.condition, context) as BooleanVariable;
+      executeAST(node.endStatement, newContext);
+      conditionResult = executeAST(node.condition, newContext) as BooleanVariable;
     }
 
     return new NullVariable();
 
   } else if (node instanceof FunctionNode) {
 
+    const newContext = context.newScope();
+
     let returnValue: Variable = new NullVariable();
 
     for(const execNode of node.executeBranch) {
       if(execNode instanceof ReturnNode) {
-        returnValue = executeAST(execNode, context);
+        returnValue = executeAST(execNode, newContext);
         break;
       } else {
-        executeAST(execNode, context);
+        const result = executeAST(execNode, newContext);
+        if(result.type != VariableType.Null) return result;
       }
     }
 
     for(const param of node.parameters) {
-      context.deleteVariable(param.name.value);
+      newContext.deleteVariable(param.name.value);
     }
 
     return returnValue;
 
+  } else if(node instanceof ReturnNode) {
+
+    return executeAST(node.value, context);
+
   } else if (node instanceof FunctionCallNode) {
+    const newContext = context.newScope();
+
     const variableParameters: Variable[] = [];
 
     for(const parameter of node.parameters) {
-      variableParameters.push(executeAST(parameter, context));
+      variableParameters.push(executeAST(parameter, newContext));
     }
 
     if(node.value === "printLn") {
@@ -210,7 +251,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters.length < 1) 
         throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
       const output = printLn(variableParameters);
-      context.addOutput(output);
+      newContext.addOutput(output);
 
     } else if(node.value === "concat") {
 
@@ -227,7 +268,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
         if(variableParameters[i].type != param.param_type) {
           throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.name.value} expected type ${param.value.type}, received ${variableParameters[i].type}`);
         }
-        context.initializeVariable(param.name.value, variableParameters[i]);
+        newContext.initializeVariable(param.name.value, variableParameters[i]);
         i++;
       }
       
@@ -235,7 +276,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters.length != func.parameterCount) 
         throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
 
-      return executeAST(func.value, context);
+      return executeAST(func.value, newContext);
     }
 
     return new NullVariable();

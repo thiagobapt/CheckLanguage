@@ -52,7 +52,7 @@ export interface ASTNode {
 
   export class ReturnNode implements ASTNode {
     id: number;
-    constructor(public value: string) {
+    constructor(public value: ASTNode) {
       this.id = ASTNodeCounter.getNextId();
     }
     type = "Return";

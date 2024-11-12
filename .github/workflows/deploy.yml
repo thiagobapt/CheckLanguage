@@ -20,20 +20,19 @@ jobs:
       - name: Install compiler dependecies
         run: npm install
 
-      - name: Go to Website folder
-        run: cd CheckLanguageWebsite
-
       - name: Install website dependecies
         run: npm install
+        path: ./CheckLanguageWebsite
 
       - name: Build project
         run: npm run build
+        path: ./CheckLanguageWebsite
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3
         with:
           name: production-files
-          path: ./dist
+          path: ./CheckLanguageWebsite/dist
 
   deploy:
     name: Deploy
@@ -46,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: production-files
-          path: ./dist
+          path: ./CheckLanguageWebsite/dist
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

@@ -22,11 +22,11 @@ jobs:
 
       - name: Install website dependecies
         run: npm install
-        path: ./CheckLanguageWebsite
+        working-directory: ./CheckLanguageWebsite
 
       - name: Build project
         run: npm run build
-        path: ./CheckLanguageWebsite
+        working-directory: ./CheckLanguageWebsite
 
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v3

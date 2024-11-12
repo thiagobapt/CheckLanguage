@@ -73,16 +73,16 @@ function check() {
 function App() {
 
   const [text, setText] = useState(`/* 
-This is a demonstration of the Check Language with the recursive function "fibonacci" that return the fibonacci sequence.
+This is a demonstration of the Check Language with the recursive function "fibonacci" that returns the fibonacci sequence.
 */
 
 printLn("Fibonacci sequence: ")
 
 function fibonacci(number previousValue, number currentValue) {
-  if(currentValue < 100) { 
-    var novoValor = currentValue + previousValue;
+  if(currentValue < 1000) { 
+    var newValue = currentValue + previousValue;
     printLn(currentValue)
-    return fibonacci(currentValue, novoValor);
+    return fibonacci(currentValue, newValue);
   } else {
     return currentValue;
   }
@@ -94,12 +94,16 @@ printLn(fibonacci(0, 1))`);
   return (
     <>
       <div className="w-screen h-screen">
-        <div className="h-3/5 overflow-auto">
-          <ReactCodeMirror value={text} onChange={(e) => {setText(e)}} theme={vscodeDark} extensions={[check()]}/>
+        <div className="h-3/5 flex flex-col place-content-start">
+          <h1 className="w-full text-center">Check Language</h1>
+          <h2 className="w-full text-center">An interpreted language made with Typescript</h2>
+          <div className="overflow-auto">
+            <ReactCodeMirror value={text} minHeight="100vh" onChange={(e) => {setText(e)}} theme={vscodeDark} extensions={[check()]}/>
+          </div>
         </div>
-        <div className="h-2/5 p-1 w-screen flex flex-col place-content-center space-y-1 overflow-hidden">
-          <div className="flex place-content-center">
-            <button className="h-fit w-fit hover:bg-slate-800 focus:outline-none" onClick={() => {
+        <div className="h-2/5 p-4 w-screen flex flex-wrap place-content-start space-y-1 overflow-hidden bg-stone-900">
+          <div className="flex place-content-start items-center w-full h-10 border-b-[1px] border-slate-600/20">
+            <button className="h-6 w-fit text-white/70 text-sm bg-transparent focus:outline-none hover:border-b-2 hover:border-b-slate-600" onClick={() => {
               let result = "";
               try {
                 result = interpretProgram(text)!;
@@ -108,9 +112,9 @@ printLn(fibonacci(0, 1))`);
                 result = e;
               }
               setOutput(result);
-            }}>Rodar</button>
+            }}>RUN CODE</button>
           </div>
-          <textarea className="w-full h-full disabled:bg-stone-900" value={output} disabled></textarea>
+          <textarea className="w-full h-full disabled:bg-stone-900 resize-none" value={output} disabled></textarea>
         </div>
       </div>
     </>

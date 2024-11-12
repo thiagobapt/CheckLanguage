@@ -55,7 +55,7 @@ export function interpretProgram(input: string) {
     }
 
     // Exibir o JSON da AST
-    const astJson = JSON.stringify(astNodes, null, 2);
+    // const astJson = JSON.stringify(astNodes, null, 2);
     // console.log("AST em JSON:");
     // console.log(astJson);
 

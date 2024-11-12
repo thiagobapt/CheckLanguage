@@ -9,18 +9,18 @@ export function evaluateBinaryOp(
 
   switch (operator) {
     case "+":
-      return new NumberVariable(left.value + right.value);
+      return new NumberVariable(left.value! + right.value!);
     case "-":
-      return new NumberVariable(left.value - right.value);
+      return new NumberVariable(left.value! - right.value!);
     case "*":
-      return new NumberVariable(left.value * right.value);
+      return new NumberVariable(left.value! * right.value!);
     case "/":
       if (right.value === 0) {
         throw new Error("Division by zero.");
       }
-      return new NumberVariable(left.value / right.value);
+      return new NumberVariable(left.value! / right.value!);
     case "%":
-      return new NumberVariable(left.value % right.value);
+      return new NumberVariable(left.value! % right.value!);
     default:
       throw new Error(`Operator not supported: ${operator}`);
   }
@@ -41,13 +41,13 @@ export function evaluateCondition(
       case "!=":
         return new BooleanVariable(left.value !== right.value);
       case "<":
-        return new BooleanVariable(left.value < right.value);
+        return new BooleanVariable(left.value! < right.value!);
       case "<=":
-        return new BooleanVariable(left.value < right.value);
+        return new BooleanVariable(left.value! < right.value!);
       case ">":
-        return new BooleanVariable(left.value < right.value);
+        return new BooleanVariable(left.value! < right.value!);
       case ">=":
-        return new BooleanVariable(left.value >= right.value);
+        return new BooleanVariable(left.value! >= right.value!);
       default:
         throw new Error(`Conditional operator "${operator}" not supported for type: ${left.type}`);
     }

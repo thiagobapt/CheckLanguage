@@ -168,7 +168,8 @@ export class Parser {
     let node = this.factor();
     while (
       this.currentToken.type === TokenType.Multiply ||
-      this.currentToken.type === TokenType.Divide
+      this.currentToken.type === TokenType.Divide ||
+      this.currentToken.type === TokenType.Modulus
     ) {
       const token = this.currentToken;
       this.eat(token.type);

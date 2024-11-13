@@ -43,9 +43,9 @@ export function evaluateCondition(
       case "<":
         return new BooleanVariable(left.value! < right.value!);
       case "<=":
-        return new BooleanVariable(left.value! < right.value!);
+        return new BooleanVariable(left.value! <= right.value!);
       case ">":
-        return new BooleanVariable(left.value! < right.value!);
+        return new BooleanVariable(left.value! > right.value!);
       case ">=":
         return new BooleanVariable(left.value! >= right.value!);
       default:

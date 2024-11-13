@@ -3,30 +3,17 @@ An interpreted language written in Typescript.
 
 Experiment with Check Language in the [code sandbox](https://thiagobapt.github.io/CheckLanguage/)!
 
-## Features and syntax
-
-Currently, Check supports:
-- Variable types:
-  - Number
-  - String
-  - Boolean
-- If Statements
-- Else Statements
-- While Loops
-- For Loops
-- Functions
+## Writing code in Check Lang
 
 ### Variable declaration and assignement
-Variables are declared like this:
 
-`var name = 10;`
+Variables are declared following this syntax `"var" name "=" expression ";"`.
+For example: `var example = 1;` or using an expression `var example = 2 * (3 - 4);`
 
-The keyword "var" is used to declare a variable.
+You can assign a new value to a variable following this syntax `name "=" expression ";"`.
+For example `example = 2;` or using an expression `var example = 10 + (2 * 3);`
 
-To assign a new value to a variable, it's done like this:
+### If statements
 
-`name = 20;`
-
-Check also supports expression with parenthesis, so you can also do this:
-
-`name = name * (10 + 20);`
+In Check Lang, an If Statement is writting following this syntax `"if" "(" condition ")" "{" statement* "}" ( "else" "{" statement* "}" )?`.
+What  this means is that an "else" statement is optional and you can have as many statements inside the brackets as you want.

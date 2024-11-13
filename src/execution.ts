@@ -262,6 +262,8 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     } else {
       const func = context.getFunction(node.value);
 
+      if(variableParameters.length != func.parameterCount) throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
+
       let i = 0;
 
       for(const param of func.value.parameters) {
@@ -271,10 +273,6 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
         newContext.initializeVariable(param.name.value, variableParameters[i]);
         i++;
       }
-      
-
-      if(variableParameters.length != func.parameterCount) 
-        throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
 
       return executeAST(func.value, newContext);
     }

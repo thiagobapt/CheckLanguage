@@ -59,6 +59,10 @@ export function evaluateCondition(
         return new BooleanVariable(left.value === right.value);
       case "!=":
         return new BooleanVariable(left.value !== right.value);
+      case "&&":
+        return new BooleanVariable(left.value! && right.value!);
+      case "||":
+        return new BooleanVariable(left.value! || right.value!);
       default:
         throw new Error(`Conditional operator "${operator}" not supported for type: ${left.type}`);
     }

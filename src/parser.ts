@@ -1,6 +1,6 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode, ReturnNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode, ReturnNode, ArrayNode } from "./ast-nodes";
 import { BooleanVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class Parser {
@@ -61,6 +61,18 @@ export class Parser {
         this.eat(this.currentToken.type);
         const right = this.expr();
         return new ConditionalNode(left, "<=", right);
+      }
+
+      case TokenType.And: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "&&", right);
+      }
+
+      case TokenType.Or: {
+        this.eat(this.currentToken.type);
+        const right = this.expr();
+        return new ConditionalNode(left, "||", right);
       }
 
     }
@@ -136,7 +148,7 @@ export class Parser {
 
       this.eat(TokenType.Function);
       this.eat(TokenType.LeftParen);
-      const parameters = this.parameters();
+      const parameters = this.expression_list();
       this.eat(TokenType.RightParen);
 
       return new FunctionCallNode(token.value, parameters);
@@ -160,8 +172,13 @@ export class Parser {
       const node = this.expr();
       this.eat(TokenType.RightParen);
       return node;
+    } else if (token.type === TokenType.LeftSquareBracket) {
+      this.eat(TokenType.LeftSquareBracket);
+      const nodes = this.expression_list();
+      this.eat(TokenType.RightSquareBracket);
+      return new ArrayNode(nodes);
     }
-    throw new Error(`Fator inválido: ${token.value}`);
+    throw new Error(`Invalid factor: ${token.value}`);
   }
 
   private term(): ASTNode {
@@ -191,7 +208,7 @@ export class Parser {
     return node;
   }
 
-  private parameters(): ASTNode[] {
+  private expression_list(): ASTNode[] {
     const expressions: ASTNode[] = [];
     while(
       this.currentToken.type == TokenType.Name ||
@@ -199,6 +216,7 @@ export class Parser {
       this.currentToken.type == TokenType.String ||
       this.currentToken.type == TokenType.Quotation ||
       this.currentToken.type == TokenType.CloseQuotation ||
+      this.currentToken.type == TokenType.LeftSquareBracket ||
       this.currentToken.type == TokenType.Boolean ||
       this.currentToken.type == TokenType.Function ||
       this.currentToken.type == TokenType.Comma

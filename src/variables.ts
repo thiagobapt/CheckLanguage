@@ -2,6 +2,7 @@ export enum VariableType {
     Number = "NUMBER",
     String = "STRING",
     Boolean = "BOOLEAN",
+    Array = "ARRAY",
     Null = "NULL"
 }
 
@@ -38,6 +39,17 @@ export class BooleanVariable {
     }
 }
 
+export class ArrayVariable {
+    public name: string;
+    public type: VariableType.Array = VariableType.Array;
+    public value: Variable[];
+
+    constructor(value: Variable[], name: string = "") {
+        this.name = name;
+        this.value = value;
+    }
+}
+
 export class NullVariable {
     public name: string;
     public type: VariableType.Null = VariableType.Null;
@@ -48,4 +60,4 @@ export class NullVariable {
     }
 }
 
-export type Variable = NumberVariable | StringVariable | NullVariable | BooleanVariable;
+export type Variable = NumberVariable | StringVariable | NullVariable | BooleanVariable | ArrayVariable;

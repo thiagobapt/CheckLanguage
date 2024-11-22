@@ -41,6 +41,14 @@ export interface ASTNode {
     }
     type = "Boolean";
   }
+
+  export class ArrayNode implements ASTNode {
+    id: number;
+    constructor(public value: ASTNode[]) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Array";
+  }
   
   export class NameNode implements ASTNode {
     id: number;

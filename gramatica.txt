@@ -11,10 +11,10 @@
 <if_statement>           ::= "if" "(" <conditional> ")" "{" <statement_list> "}" ["else" "{" <statement_list> "}" ]
 <while_statement>        ::= "while" "(" <conditional> ")" "{" <statement> "}"
 <for_statement>          ::= "for" "(" <assignment> ";" <conditional> ";" <statement> ")" "{" <statement> "}"
-<function>               ::= <name> "(" <parameters> ")" [ ";" ]
+<function>               ::= <name> "(" <expression_list> ")" [ ";" ]
 <function_declaration>   ::= "function" <name> "(" <parameter_declaration> ")" "{" statement_list return_statement "}"
 <return_statement>       ::= "return" statement
-<parameters>             ::= { <expression> | [ "," <expression> ] }
+<expression_list>             ::= { <expression> | [ "," <expression> ] }
 <parameter_declaration>  ::= { <types> <name> | [ "," <types> <name> ] }
 <expression>             ::= <term> { ("+" | "-") <term> }
 <term>                   ::= <factor> { ("*" | "/") <factor> }
@@ -22,6 +22,7 @@
                             | <name> 
                             | <string>
                             | <boolean>
+                            | <array>
                             | <function>
                             | "(" <expression> ")"
 <conditional>            ::= <bool_term> { ("or") <bool_term> }
@@ -29,7 +30,8 @@
 <bool_factor>            ::= <expression> <relational_operator> <expression>
 <relational_operator>    ::= "==" | "!=" | "<" | "<=" | ">" | ">="
 <number>                 ::= [0-9]+
+<array>                  ::= "[" <expression> ["," <expression>]* "]"
 <name>                   ::= [a-zA-Z_][a-zA-Z0-9_]*
 <string>                 ::= '"' .* '"'
 <comment>                 ::= '/*' .* '*/'
-<types>                  ::= { "string"| "number" | "bool" | "null" }
+<types>                  ::= ( "string"| "number" | "bool" | "null" )

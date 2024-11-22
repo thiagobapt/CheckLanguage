@@ -24,10 +24,14 @@ export enum TokenType {
   NotEquals = "!=",
   LessThanOrEquals = "<=",
   MoreThanOrEquals = ">=",
+  And = "&&",
+  Or = "||",
   If = "IF",
   Else = "ELSE",
   LeftBracket = "{",
   RightBracket = "}",
+  LeftSquareBracket = "[",
+  RightSquareBracket = "]",
   While = "WHILE",
   For = "FOR",
   Var = "VAR",
@@ -166,6 +170,8 @@ export class Lexer {
       ";": TokenType.Semicolon,
       "{": TokenType.LeftBracket,
       "}": TokenType.RightBracket,
+      "[": TokenType.LeftSquareBracket,
+      "]": TokenType.RightSquareBracket,
       "\"": TokenType.Quotation,
       ",": TokenType.Comma
     };
@@ -228,6 +234,22 @@ export class Lexer {
           return new Token(TokenType.MoreThanOrEquals, ">=");
         }
         return new Token(TokenType.MoreThan, ">");
+      }
+
+      if (this.currentChar === "&") {
+        const nextChar = this.advance();
+        if (nextChar === "&") {
+          this.advance();
+          return new Token(TokenType.And, "&&");
+        }
+      }
+
+      if (this.currentChar === "|") {
+        const nextChar = this.advance();
+        if (nextChar === "|") {
+          this.advance();
+          return new Token(TokenType.Or, "||");
+        }
       }
 
       if (operatorTokens[this.currentChar]) {

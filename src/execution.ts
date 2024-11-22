@@ -17,10 +17,11 @@ import {
   ReturnNode,
   ParameterDeclarationNode,
   FunctionDeclarationNode,
+  ArrayNode,
 } from "./ast-nodes";
-import { FunctionVariable, concat, printLn } from "./functions";
+import { FunctionVariable, concat, index, pop, printLn, push, setIndex } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
-import { BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
+import { ArrayVariable, BooleanVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class ExecutionContext {
   private variables: { [key: string]: Variable } = {};
@@ -135,6 +136,13 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
   } else if (node instanceof BooleanNode) {
     const value = node.value === "true";
     return new BooleanVariable(value);
+
+  } else if (node instanceof ArrayNode) {
+    const variables = [];
+    for(const arrayNode of node.value) {
+      variables.push(executeAST(arrayNode, context));
+    }
+    return new ArrayVariable(variables);
 
   } else if (node instanceof NameNode) {
 
@@ -258,6 +266,65 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters.length < 1) 
         throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
       return concat(variableParameters);
+
+    } else if(node.value === "index") {
+
+      if(variableParameters.length < 2) 
+        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
+      
+      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+
+      return index(variableParameters[0], variableParameters[1], context);
+
+    } else if(node.value === "push") {
+
+      if(variableParameters.length < 2) 
+        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
+      
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      
+      const newArray = push(variableParameters[0], variableParameters[1]);
+
+      context.setVariable(newArray.name, newArray);
+
+      return newArray;
+
+    } else if(node.value === "setIndex") {
+
+      if(variableParameters.length < 3) 
+        throw new Error(`Function ${node.value} expected 3 parameters, received ${variableParameters.length}.`);
+      
+      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
+      if(variableParameters[2].type != VariableType.Array) throw new Error(`${variableParameters[2].name} isn't of type ${VariableType.Array}.`);
+
+      const newArray = setIndex(variableParameters[0], variableParameters[1], variableParameters[2]);
+
+      context.setVariable(newArray.name, newArray);
+
+      return newArray;
+
+    } else if(node.value === "pop") {
+
+      if(variableParameters.length < 2) 
+        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
+      
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      
+      const popped = pop(variableParameters[1], context);
+
+      return popped;
+
+    } else if(node.value === "length") {
+
+      if(variableParameters.length < 1) 
+        throw new Error(`Function ${node.value} expected 1 parameters, received ${variableParameters.length}.`);
+      
+      if(variableParameters[0].type !== VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      
+      const length = variableParameters[0].value.length;
+
+      return new NumberVariable(length);
 
     } else {
       const func = context.getFunction(node.value);

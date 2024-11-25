@@ -1,5 +1,5 @@
 import { FunctionNode } from "./ast-nodes";
-import { executeAST, ExecutionContext } from "./execution";
+import { ExecutionContext } from "./execution";
 import { ArrayVariable, NullVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class FunctionVariable {
@@ -81,7 +81,7 @@ export function concat(variables: Variable[]) {
     return new StringVariable(result);
 }
 
-export function index(index: NumberVariable, array: ArrayVariable, context: ExecutionContext) {
+export function index(index: NumberVariable, array: ArrayVariable) {
     if(index.value === undefined) throw new Error(`${index.name} is undefined`);
     if(index.value >= array.value.length) throw new Error(`Index ${index.value} is out of bounds for ${array.name.length === 0 ? array.value.toString() : array.name}`);
 

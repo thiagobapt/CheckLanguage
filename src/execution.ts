@@ -275,7 +275,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
       if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
 
-      return index(variableParameters[0], variableParameters[1], context);
+      return index(variableParameters[0], variableParameters[1]);
 
     } else if(node.value === "push") {
 

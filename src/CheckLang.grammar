@@ -30,7 +30,9 @@ expression { term ( Expression_Operator term )? }
 
 term { factor ( Term_Operator factor )? }
 
-factor { Number | Name | String | Boolean | Function_Call | "(" expression ")" }
+factor { Number | Name | String | Boolean | Function_Call | Array | "(" expression ")" }
+
+Array { "[" expression ("," expression)* "]" }
 
 Conditional { bool_term ( "or" bool_term )? }
 
@@ -54,7 +56,7 @@ bool_factor { expression Logical_Operator expression }
   Term_Operator { "*" | "/" | "%" }
   Types { "string" | "number" | "bool" }
   @precedence { "while", "if", "else", "for", "var", "function", "return", Boolean, Name }
-  "(" ")" "{" "}" "=" ";" "," "/*" "*/"
+  "(" ")" "{" "}" "=" ";" "," "/*" "*/" "[" "]"
 }
 
 @detectDelim

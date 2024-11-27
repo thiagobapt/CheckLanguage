@@ -35,6 +35,7 @@ let parserWithMetadata = parser.configure({
       "( )": t.paren,
       "{ }": t.bracket,
       "= ; ,": t.operator,
+      "[ ]": t.squareBracket
     }),
     indentNodeProp.add({
       Application: context => context.column(context.node.from) + context.unit
@@ -62,6 +63,11 @@ const checkCompletion = checkLanguage.data.of({
     {label: "bool", type: "type"},
     {label: "printLn", type: "function"},
     {label: "concat", type: "function"},
+    {label: "index", type: "function"},
+    {label: "setIndex", type: "function"},
+    {label: "push", type: "function"},
+    {label: "pop", type: "function"},
+    {label: "length", type: "function"},
   ])
 })
 

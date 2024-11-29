@@ -48,3 +48,6 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 ## Dictionary
 
 "var", "if", "else", "while", "for", "function", "return", "string", "number", "bool", "array", "true", "false"
+
+## Documentação do Projeto
+https://docs.google.com/document/d/1syiRyh4AbRsDIyqXPEL1-A7_LkdYG9xqsPr2amoVKQo/edit?tab=t.0

@@ -5,7 +5,7 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 
 
 ## Grammar
-
+```
 <program>                ::= <statement> | <statement> <program>
 <statement_list>         ::= <statement> ( <statement> )*
 <statement>              ::= <assignment> 
@@ -43,20 +43,8 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 <string>                 ::= '"' .* '"'
 <comment>                 ::= '/*' .* '*/'
 <types>                  ::= ( "string"| "number" | "bool" | "array" | "null" )
-
+```
 
 ## Dictionary
 
-"var"
-"if"
-"else"
-"while"
-"for"
-"function"
-"return"
-"string"
-"number"
-"bool"
-"array"
-"true"
-"false"
+"var", "if", "else", "while", "for", "function", "return", "string", "number", "bool", "array", "true", "false"

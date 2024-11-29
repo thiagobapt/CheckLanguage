@@ -48,6 +48,8 @@ export class Token {
 }
 
 export class Lexer {
+  private currentLine: number = 1;
+  private currentLineChar: number = 1;
   private position: number = 0;
   private currentChar: string | null = null;
   private previousTokenType: TokenType = TokenType.EOF;
@@ -60,7 +62,22 @@ export class Lexer {
     this.previousTokenType = type;
   }
 
+  public getCurrentLine() {
+    return this.currentLine;
+  }
+
+  public getCurrentLineChar() {
+    return this.currentLineChar;
+  }
+
+  private newLine() {
+    this.currentLine++;
+    this.currentLineChar = 0;
+  }
+
   private advance() {
+    this.currentLineChar++;
+    if(this.currentChar && /\n/.test(this.currentChar)) this.newLine();
     this.position++;
     return this.currentChar = this.position < this.input.length ? this.input[this.position] : null;
   }
@@ -272,7 +289,7 @@ export class Lexer {
         return token;
       }
 
-      throw new Error(`Invalid character: ${this.currentChar}`);
+      throw new Error(`Invalid character: '${this.currentChar}' at line ${this.currentLine}:${this.currentLineChar}`);
     }
 
     return new Token(TokenType.EOF, "");

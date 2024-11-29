@@ -16,7 +16,7 @@ export class Parser {
       this.currentToken = this.lexer.getNextToken();
     } else {
       throw new Error(
-        `Unexpected token: ${this.currentToken.type} (${this.currentToken.value}), expected: ${tokenType}`
+        `Unexpected token: ${this.currentToken.type} (${this.currentToken.value}), expected: ${tokenType}. At line: ${this.lexer.getCurrentLine()}:${this.lexer.getCurrentLineChar()}`
       );
     }
   }
@@ -30,49 +30,49 @@ export class Parser {
       case TokenType.EqualsEquals: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "==", right);
+        return new ConditionalNode(left, "==", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.NotEquals: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "!=", right);
+        return new ConditionalNode(left, "!=", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.MoreThan: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, ">", right);
+        return new ConditionalNode(left, ">", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.LessThan: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "<", right);
+        return new ConditionalNode(left, "<", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.MoreThanOrEquals: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, ">=", right);
+        return new ConditionalNode(left, ">=", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.LessThanOrEquals: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "<=", right);
+        return new ConditionalNode(left, "<=", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.And: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "&&", right);
+        return new ConditionalNode(left, "&&", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
       case TokenType.Or: {
         this.eat(this.currentToken.type);
         const right = this.expr();
-        return new ConditionalNode(left, "||", right);
+        return new ConditionalNode(left, "||", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
 
     }
@@ -100,7 +100,7 @@ export class Parser {
       this.eat(TokenType.RightBracket);
     }
   
-    return new IfNode(condition, thenBranch, elseBranch);
+    return new IfNode(condition, thenBranch, elseBranch, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private whileStatement(): ASTNode {
@@ -114,7 +114,7 @@ export class Parser {
     const doBranch: ASTNode[] = this.statement_list();;
     this.eat(TokenType.RightBracket);
 
-    return new WhileNode(condition, doBranch);
+    return new WhileNode(condition, doBranch, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private forStatement(): ASTNode {
@@ -131,7 +131,7 @@ export class Parser {
     const doBranch: ASTNode[] = this.statement_list();
     this.eat(TokenType.RightBracket);
 
-    return new ForNode(index, condition, endStatement, doBranch);
+    return new ForNode(index, condition, endStatement, doBranch, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
   
   // fim da parte nova
@@ -140,10 +140,10 @@ export class Parser {
     const token = this.currentToken;
     if (token.type === TokenType.Number) {
       this.eat(TokenType.Number);
-      return new NumberNode(token.value);
+      return new NumberNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     } else if (token.type === TokenType.Name) {
       this.eat(TokenType.Name);
-      return new NameNode(token.value);
+      return new NameNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     } else if (token.type === TokenType.Function) {
 
       this.eat(TokenType.Function);
@@ -151,7 +151,7 @@ export class Parser {
       const parameters = this.expression_list();
       this.eat(TokenType.RightParen);
 
-      return new FunctionCallNode(token.value, parameters);
+      return new FunctionCallNode(token.value, parameters, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
 
     } else if (token.type === TokenType.Quotation) {
 
@@ -163,10 +163,10 @@ export class Parser {
 
     } else if (token.type === TokenType.String) {
       this.eat(TokenType.String);
-      return new StringNode(token.value);
+      return new StringNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     } else if (token.type === TokenType.Boolean) {
       this.eat(TokenType.Boolean);
-      return new BooleanNode(token.value);
+      return new BooleanNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     } else if (token.type === TokenType.LeftParen) {
       this.eat(TokenType.LeftParen);
       const node = this.expr();
@@ -176,9 +176,9 @@ export class Parser {
       this.eat(TokenType.LeftSquareBracket);
       const nodes = this.expression_list();
       this.eat(TokenType.RightSquareBracket);
-      return new ArrayNode(nodes);
+      return new ArrayNode(nodes, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
-    throw new Error(`Invalid factor: ${token.value}`);
+    throw new Error(`Invalid factor: ${token.value}. At line: ${this.lexer.getCurrentLine()}:${this.lexer.getCurrentLineChar()}`);
   }
 
   private term(): ASTNode {
@@ -190,7 +190,7 @@ export class Parser {
     ) {
       const token = this.currentToken;
       this.eat(token.type);
-      node = new BinaryOpNode(node, token.value, this.factor());
+      node = new BinaryOpNode(node, token.value, this.factor(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
     return node;
   }
@@ -203,7 +203,7 @@ export class Parser {
     ) {
       const token = this.currentToken;
       this.eat(token.type);
-      node = new BinaryOpNode(node, token.value, this.term());
+      node = new BinaryOpNode(node, token.value, this.term(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
     return node;
   }
@@ -266,7 +266,7 @@ export class Parser {
       const name = this.currentToken.value;
       if(this.currentToken.type === TokenType.Name) this.eat(TokenType.Name);
       if(this.currentToken.type === TokenType.Comma) this.eat(TokenType.Comma);
-      params.push(new ParameterDeclarationNode(variable, new NameNode(name), paramType));
+      params.push(new ParameterDeclarationNode(variable, new NameNode(name, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar()), paramType, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar()));
     }
     return params;
   }
@@ -277,7 +277,7 @@ export class Parser {
     this.eat(TokenType.Equals);
     const exprNode = this.expr();
     this.eat(TokenType.Semicolon);
-    return new AssignmentNode(new NameNode(variableToken.value), exprNode);
+    return new AssignmentNode(new NameNode(variableToken.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar()), exprNode, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private initialization(): ASTNode {
@@ -287,14 +287,14 @@ export class Parser {
     this.eat(TokenType.Equals);
     const exprNode = this.expr();
     this.eat(TokenType.Semicolon);
-    return new InitializationNode(new NameNode(variableToken.value), exprNode);
+    return new InitializationNode(new NameNode(variableToken.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar()), exprNode, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private return_statement(): ASTNode {
     this.eat(TokenType.Return);
     const exprNode = this.expr();
     this.eat(TokenType.Semicolon);
-    return new ReturnNode(exprNode);
+    return new ReturnNode(exprNode, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private functionDeclaration(): ASTNode {
@@ -307,7 +307,7 @@ export class Parser {
     this.eat(TokenType.LeftBracket);
     const execBranch: ASTNode[] = this.statement_list();
     this.eat(TokenType.RightBracket);
-    return new FunctionDeclarationNode(new FunctionNode(nameToken.value, parameters, execBranch));
+    return new FunctionDeclarationNode(new FunctionNode(nameToken.value, parameters, execBranch, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar()), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   public statement_list(): ASTNode[] {
@@ -324,7 +324,7 @@ export class Parser {
       this.currentToken.type == TokenType.Return
       
     ) {
-      if(hasReturnStatement) throw new Error(`${this.currentToken.value} is unreacheable!`);
+      if(hasReturnStatement) throw new Error(`${this.currentToken.value} is unreacheable! At line: ${this.lexer.getCurrentLine()}:${this.lexer.getCurrentLineChar()}`);
       if(this.currentToken.type === TokenType.Return) hasReturnStatement = true;
       statements.push(this.statement());
     }

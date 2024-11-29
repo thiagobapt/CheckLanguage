@@ -50,7 +50,7 @@ export function interpretProgram(input: string) {
     while (lexer.lookAhead().type !== TokenType.EOF) {
       const astNode = parser.parse();
       astNodes.push(astNodeToJson(astNode));
-      console.log("ast node ", JSON.stringify(astNode, null, 4));
+      // console.log("ast node ", JSON.stringify(astNode, null, 4));
       executeAST(astNode, context);
     }
 
@@ -60,10 +60,10 @@ export function interpretProgram(input: string) {
     // console.log(astJson);
 
     // Exibir o resultado final de todas as variáveis armazenadas no contexto
-    console.log("Valores das variáveis:");
-    for (const [name, value] of Object.entries(context['variables'])) {
-      console.log(`${name}: ${JSON.stringify(value)}`);
-    }
+    // console.log("Valores das variáveis:");
+    // for (const [name, value] of Object.entries(context['variables'])) {
+    //   console.log(`${name}: ${JSON.stringify(value)}`);
+    // }
     let finalOutput = "";
     for(const output of context.getOutput()) {
       finalOutput = finalOutput + `${output}\n`
@@ -71,7 +71,7 @@ export function interpretProgram(input: string) {
 
     return finalOutput;
   } catch (error: any) {
-    console.error("Erro durante a execução:");
+    console.error("Error during execution:");
     console.error(error);
     throw new Error(error)
   }

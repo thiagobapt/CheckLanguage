@@ -47,7 +47,7 @@ export class ExecutionContext {
         this.scope.setVariable(name, variable);
         return;
       } else {
-        throw new Error(`Variable "${name}" is not defined.`);
+        throw new Error(`Variable "${name}" is already defined.`);
       }
     }
 
@@ -121,8 +121,8 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     const left = executeAST(node.left, context);
     const right = executeAST(node.right, context);
     
-    if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and can't be used in a math operation.`);
-    if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and can't be used in a math operation.`);
+    if(left.type != VariableType.Number) throw new Error(`Variable ${left.name} is of type ${left.type} and can't be used in a math operation. At line: ${node.line}:${node.char}`);
+    if(right.type != VariableType.Number) throw new Error(`Variable ${right.name} is of type ${right.type} and can't be used in a math operation. At line: ${node.line}:${node.char}`);
 
     return evaluateBinaryOp(node.operator, left, right);
 
@@ -258,32 +258,32 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     if(node.value === "printLn") {
 
       if(variableParameters.length < 1) 
-        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
+        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
       const output = printLn(variableParameters);
       newContext.addOutput(output);
 
     } else if(node.value === "concat") {
 
       if(variableParameters.length < 1) 
-        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}.`);
+        throw new Error(`Function ${node.value} expected 1 or more parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
       return concat(variableParameters);
 
     } else if(node.value === "index") {
 
       if(variableParameters.length < 2) 
-        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
+        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
       
-      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
-      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}. At line: ${node.line}:${node.char}`);
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}. At line: ${node.line}:${node.char}`);
 
       return index(variableParameters[0], variableParameters[1]);
 
     } else if(node.value === "push") {
 
       if(variableParameters.length < 2) 
-        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
+        throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
       
-      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}. At line: ${node.line}:${node.char}`);
       
       const newArray = push(variableParameters[0], variableParameters[1]);
 
@@ -296,8 +296,8 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters.length < 3) 
         throw new Error(`Function ${node.value} expected 3 parameters, received ${variableParameters.length}.`);
       
-      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
-      if(variableParameters[2].type != VariableType.Array) throw new Error(`${variableParameters[2].name} isn't of type ${VariableType.Array}.`);
+      if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}. At line: ${node.line}:${node.char}`);
+      if(variableParameters[2].type != VariableType.Array) throw new Error(`${variableParameters[2].name} isn't of type ${VariableType.Array}. At line: ${node.line}:${node.char}`);
 
       
       const newArray = setIndex(variableParameters[0], variableParameters[1], variableParameters[2]);
@@ -311,7 +311,7 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters.length < 2) 
         throw new Error(`Function ${node.value} expected 2 parameters, received ${variableParameters.length}.`);
       
-      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      if(variableParameters[1].type != VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}. At line: ${node.line}:${node.char}`);
       
       const popped = pop(variableParameters[1], context);
 
@@ -320,9 +320,9 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     } else if(node.value === "length") {
 
       if(variableParameters.length < 1) 
-        throw new Error(`Function ${node.value} expected 1 parameters, received ${variableParameters.length}.`);
+        throw new Error(`Function ${node.value} expected 1 parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
       
-      if(variableParameters[0].type !== VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}.`);
+      if(variableParameters[0].type !== VariableType.Array) throw new Error(`${variableParameters[1].name} isn't of type ${VariableType.Array}. At line: ${node.line}:${node.char}`);
       
       const length = variableParameters[0].value.length;
 
@@ -331,13 +331,13 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     } else {
       const func = context.getFunction(node.value);
 
-      if(variableParameters.length != func.parameterCount) throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}.`);
+      if(variableParameters.length != func.parameterCount) throw new Error(`Function ${func.name} expected ${func.parameterCount} parameters, received ${variableParameters.length}. At line: ${node.line}:${node.char}`);
 
       let i = 0;
 
       for(const param of func.value.parameters) {
         if(variableParameters[i].type != param.param_type) {
-          throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.name.value} expected type ${param.value.type}, received ${variableParameters[i].type}`);
+          throw new Error(`Incorret parameter type passed to function ${func.name}! Parameter ${param.name.value} expected type ${param.value.type}, received ${variableParameters[i].type} At line: ${node.line}:${node.char}`);
         }
         newContext.initializeVariable(param.name.value, variableParameters[i]);
         i++;
@@ -371,5 +371,5 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
   }
 
-  throw new Error(`Unsupported AST node: ${JSON.stringify(node, null, 4)}`);
+  throw new Error(`Unsupported AST node: ${JSON.stringify(node, null, 4)}  At line: ${node.line}:${node.char}`);
 }

@@ -4,64 +4,96 @@ import { Variable, VariableType } from "./variables";
 export interface ASTNode {
     type: string;
     id: number;
+    line: number;
+    char: number;
   }
   
   export class BinaryOpNode implements ASTNode {
     id: number;
+    line: number;
+    char: number;
     constructor(
       public left: ASTNode,
       public operator: string,
-      public right: ASTNode
+      public right: ASTNode,
+      line: number,
+      char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "BinaryOp";
   }
   
   export class NumberNode implements ASTNode {
     id: number;
-    constructor(public value: string) {
+    line: number;
+    char: number;
+    constructor(public value: string, line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "Number";
   }
 
   export class StringNode implements ASTNode {
     id: number;
-    constructor(public value: string) {
+    line: number;
+    char: number;
+    constructor(public value: string, line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "String";
   }
 
   export class BooleanNode implements ASTNode {
     id: number;
-    constructor(public value: string) {
+    line: number;
+    char: number;
+    constructor(public value: string, line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "Boolean";
   }
 
   export class ArrayNode implements ASTNode {
     id: number;
-    constructor(public value: ASTNode[]) {
+    line: number;
+    char: number;
+    constructor(public value: ASTNode[], line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "Array";
   }
   
   export class NameNode implements ASTNode {
     id: number;
-    constructor(public value: string) {
+    line: number;
+    char: number;
+    constructor(public value: string, line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "Name";
   }
 
   export class ReturnNode implements ASTNode {
     id: number;
-    constructor(public value: ASTNode) {
+    line: number;
+    char: number;
+    constructor(public value: ASTNode, line: number, char: number) {
       this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
     }
     type = "Return";
   }
@@ -70,7 +102,9 @@ export interface ASTNode {
     id: number;
     constructor(
       public value: string,
-      public parameters: ASTNode[]
+      public parameters: ASTNode[],
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -82,7 +116,9 @@ export interface ASTNode {
     constructor(
       public value: Variable,
       public name: NameNode,
-      public param_type: VariableType
+      public param_type: VariableType,
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -94,7 +130,9 @@ export interface ASTNode {
     constructor(
       public value: string,
       public parameters: ParameterDeclarationNode[],
-      public executeBranch: ASTNode[]
+      public executeBranch: ASTNode[],
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -104,7 +142,9 @@ export interface ASTNode {
   export class FunctionDeclarationNode implements ASTNode {
     id: number;
     constructor(
-      public value: FunctionNode
+      public value: FunctionNode,
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -113,7 +153,12 @@ export interface ASTNode {
 
   export class InitializationNode implements ASTNode {
     id: number;
-    constructor(public name: NameNode, public value: ASTNode) {
+    constructor(
+      public name: NameNode, 
+      public value: ASTNode,
+      public line: number,
+      public char: number
+    ) {
       this.id = ASTNodeCounter.getNextId();
     }
     type = "Initialization";
@@ -121,7 +166,12 @@ export interface ASTNode {
   
   export class AssignmentNode implements ASTNode {
     id: number;
-    constructor(public name: NameNode, public value: ASTNode) {
+    constructor(
+      public name: NameNode, 
+      public value: ASTNode,
+      public line: number,
+      public char: number
+    ) {
       this.id = ASTNodeCounter.getNextId();
     }
     type = "Assignment";
@@ -133,7 +183,9 @@ export interface ASTNode {
     constructor(
       public left: ASTNode,
       public operator: string,
-      public right: ASTNode
+      public right: ASTNode,
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -146,7 +198,9 @@ export interface ASTNode {
     constructor(
       public condition: ASTNode,
       public thenBranch: ASTNode[],
-      public elseBranch: ASTNode[] | null = null
+      public elseBranch: ASTNode[] | null = null,
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -158,6 +212,8 @@ export interface ASTNode {
     constructor(
       public condition: ASTNode,
       public doBranch: ASTNode[],
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }
@@ -171,6 +227,8 @@ export interface ASTNode {
       public condition: ASTNode,
       public endStatement: ASTNode,
       public doBranch: ASTNode[],
+      public line: number,
+      public char: number
     ) {
       this.id = ASTNodeCounter.getNextId();
     }

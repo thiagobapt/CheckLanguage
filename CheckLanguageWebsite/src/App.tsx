@@ -101,7 +101,7 @@ printLn(fibonacci(0, 1))`);
     <>
       <div className="w-screen h-screen">
         <div className="h-3/5 flex flex-col place-content-start">
-          <h1 className="w-full text-center font-zendots flex place-content-center space-x-2">
+          <h1 className="w-full text-lg md:text-6xl text-center font-zendots flex place-content-center space-x-2">
             <strong className="text-green-400 align-middle">CHECK</strong> <strong className="text-green-600">Language</strong>
           </h1>
           <h2 className="w-full text-center">An interpreted language made with Typescript</h2>

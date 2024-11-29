@@ -101,7 +101,9 @@ printLn(fibonacci(0, 1))`);
     <>
       <div className="w-screen h-screen">
         <div className="h-3/5 flex flex-col place-content-start">
-          <h1 className="w-full text-center">Check Language</h1>
+          <h1 className="w-full text-lg md:text-6xl text-center font-zendots flex place-content-center space-x-2">
+            <strong className="text-green-400 align-middle">CHECK</strong> <strong className="text-green-600">Language</strong>
+          </h1>
           <h2 className="w-full text-center">An interpreted language made with Typescript</h2>
           <div className="overflow-auto">
             <ReactCodeMirror value={text} minHeight="100vh" onChange={(e) => {setText(e)}} theme={vscodeDark} extensions={[check()]}/>
@@ -109,7 +111,7 @@ printLn(fibonacci(0, 1))`);
         </div>
         <div className="h-2/5 p-4 w-screen flex flex-wrap place-content-start space-y-1 overflow-hidden bg-stone-900">
           <div className="flex place-content-start items-center w-full h-10 border-b-[1px] border-slate-600/20">
-            <button className="h-6 w-fit text-white/70 text-sm bg-transparent focus:outline-none hover:border-b-2 hover:border-b-slate-600" onClick={() => {
+            <button className="h-6 w-fit text-white/80 text-sm bg-transparent focus:outline-none hover:border-b-2 hover:border-b-slate-600" onClick={() => {
               let result = "";
               try {
                 result = interpretProgram(text)!;

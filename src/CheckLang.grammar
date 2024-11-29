@@ -54,7 +54,7 @@ bool_factor { expression Logical_Operator expression }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
   Term_Operator { "*" | "/" | "%" }
-  Types { "string" | "number" | "bool" }
+  Types { "string" | "number" | "bool" | "array" }
   @precedence { "while", "if", "else", "for", "var", "function", "return", Boolean, Name }
   "(" ")" "{" "}" "=" ";" "," "/*" "*/" "[" "]"
 }

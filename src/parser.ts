@@ -254,6 +254,11 @@ export class Parser {
           variable = new BooleanVariable(undefined);
           break;
         }
+        case "array": {
+          paramType = VariableType.Array;
+          variable = new BooleanVariable(undefined);
+          break;
+        }
         default: {
           throw new Error("Invalid type");
         }

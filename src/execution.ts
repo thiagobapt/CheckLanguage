@@ -45,6 +45,7 @@ export class ExecutionContext {
     if (!(name in this.variables)) {
       if(this.scope) {
         this.scope.setVariable(name, variable);
+        return;
       } else {
         throw new Error(`Variable "${name}" is not defined.`);
       }
@@ -298,8 +299,9 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       if(variableParameters[0].type != VariableType.Number) throw new Error(`${variableParameters[0].name} isn't of type ${VariableType.Number}.`);
       if(variableParameters[2].type != VariableType.Array) throw new Error(`${variableParameters[2].name} isn't of type ${VariableType.Array}.`);
 
+      
       const newArray = setIndex(variableParameters[0], variableParameters[1], variableParameters[2]);
-
+      
       context.setVariable(newArray.name, newArray);
 
       return newArray;

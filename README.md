@@ -42,7 +42,7 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 <name>                   ::= [a-zA-Z_][a-zA-Z0-9_]*
 <string>                 ::= '"' .* '"'
 <comment>                 ::= '/*' .* '*/'
-<types>                  ::= ( "string"| "number" | "bool" | "array" | "null" )
+<types>                  ::= ( "string"| "number" | "bool" | "array" )
 ```
 
 ## Dictionary

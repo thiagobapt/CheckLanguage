@@ -118,7 +118,8 @@ export class Lexer {
     if (
       result === "string" ||
       result === "number" ||
-      result === "bool"
+      result === "bool" ||
+      result === "array"
     ) {
       return new Token(TokenType.Type, result); // implementação do Types
     }

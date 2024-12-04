@@ -34,9 +34,9 @@ factor { Number | Name | String | Boolean | Function_Call | Array | "(" expressi
 
 Array { "[" expression ("," expression)* "]" }
 
-Conditional { bool_term ( "or" bool_term )? }
+Conditional { bool_term ( Or bool_term )? }
 
-bool_term { bool_factor ( "and" bool_factor )? }
+bool_term { bool_factor ( And bool_factor )? }
 
 bool_factor { expression Logical_Operator expression }
 
@@ -51,6 +51,8 @@ bool_factor { expression Logical_Operator expression }
   String { '"' (!["])* '"' }
   space { @whitespace+ }
   Comment { "/*" (![*/])*  "*/" }
+  Or { "||" }
+  And { "&&" }
   Logical_Operator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
   Expression_Operator { "+" | "-" }
   Term_Operator { "*" | "/" | "%" }

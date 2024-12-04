@@ -32,6 +32,8 @@ let parserWithMetadata = parser.configure({
       Expression_Operator: t.arithmeticOperator,
       Term_Operator: t.arithmeticOperator,
       Comment: t.comment,
+      And: t.logicOperator,
+      Or: t.logicOperator,
       "( )": t.paren,
       "{ }": t.bracket,
       "= ; ,": t.operator,

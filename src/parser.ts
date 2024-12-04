@@ -21,8 +21,7 @@ export class Parser {
     }
   }
 
-  // parte nova 
-  private conditional(): ASTNode {
+  private bool_factor(): ASTNode {
     const left = this.expr();
 
     switch(this.currentToken.type) {
@@ -62,19 +61,32 @@ export class Parser {
         const right = this.expr();
         return new ConditionalNode(left, "<=", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
       }
+    }
 
-      case TokenType.And: {
-        this.eat(this.currentToken.type);
-        const right = this.expr();
-        return new ConditionalNode(left, "&&", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
-      }
+    return left;
+  }
 
-      case TokenType.Or: {
-        this.eat(this.currentToken.type);
-        const right = this.expr();
-        return new ConditionalNode(left, "||", right, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
-      }
+  private bool_term(): ASTNode {
+    let left = this.bool_factor();
 
+    while(
+      this.currentToken.type === TokenType.And
+    ) {
+      this.eat(TokenType.And);
+      left = new ConditionalNode(left, TokenType.And, this.bool_factor(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+    }
+
+    return left;
+  }
+
+  private conditional(): ASTNode {
+    let left = this.bool_term();
+
+    while(
+      this.currentToken.type === TokenType.Or
+    ) {
+      this.eat(TokenType.Or);
+      left = new ConditionalNode(left, TokenType.Or, this.bool_term(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
 
     return left;

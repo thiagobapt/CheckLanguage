@@ -292,9 +292,8 @@ export class Parser {
 
   private return_statement(): ASTNode {
     this.eat(TokenType.Return);
-    const exprNode = this.expr();
-    this.eat(TokenType.Semicolon);
-    return new ReturnNode(exprNode, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+    const node = this.statement();
+    return new ReturnNode(node, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
   }
 
   private functionDeclaration(): ASTNode {
@@ -354,7 +353,12 @@ export class Parser {
     else if (this.currentToken.type === TokenType.Return) {
       return this.return_statement();
     }
-    return this.expr();
+
+    const node = this.expr();
+
+    this.eat(TokenType.Semicolon);
+
+    return node;
   }
 
   public parse(): ASTNode {

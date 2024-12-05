@@ -1,7 +1,7 @@
 # Check Language
-An interpreted language written in Typescript.
+###### An interpreted language written in Typescript.
 
-Experiment with Check Language in the [code sandbox](https://thiagobapt.github.io/CheckLanguage/)!
+# Experiment with Check Language in the [code sandbox](https://thiagobapt.github.io/CheckLanguage/)!
 
 
 ## Grammar
@@ -46,9 +46,23 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 <type>                  ::= ( "string"| "number" | "bool" | "array" )
 ```
 
-## Dictionary
+## Reserved Words
 
-"var", "if", "else", "while", "for", "function", "return", "string", "number", "bool", "array", "true", "false"
+| Keyword       | Description                   |
+|---------------|-------------------------------|
+| `var`         | Declares a variable           |
+| `if`          | Conditional statement         |
+| `else`        | Alternative for `if`          |
+| `while`       | Conditional loop              |
+| `for`         | Loop with defined iteration   |
+| `function`    | Declares a function           |
+| `return`      | Returns a value from a function |
+| `string`      | Data type: text               |
+| `number`      | Data type: number             |
+| `bool`        | Data type: true/false         |
+| `array`       | Data type: list               |
+| `true`        | Boolean value: true           |
+| `false`       | Boolean value: false          |
 
-## Documentação do Projeto
+## Project Documentation
 https://docs.google.com/document/d/1syiRyh4AbRsDIyqXPEL1-A7_LkdYG9xqsPr2amoVKQo/edit?tab=t.0

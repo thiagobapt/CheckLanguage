@@ -13,7 +13,7 @@ export const
   Term_Operator = 18,
   Expression_Operator = 19,
   If_Statement = 20,
-  Conditional = 21,
+  Conditional_Expression = 21,
   Logical_Operator = 22,
   And = 23,
   Or = 24,

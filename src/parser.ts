@@ -21,7 +21,14 @@ export class Parser {
     }
   }
 
-  private bool_factor(): ASTNode {
+  private conditional_factor(): ASTNode {
+    if(this.currentToken.type === TokenType.LeftParen) {
+      this.eat(TokenType.LeftParen);
+      const expr = this.conditional_expression();
+      this.eat(TokenType.RightParen);
+      return expr;
+    }
+
     const left = this.expr();
 
     switch(this.currentToken.type) {
@@ -66,27 +73,27 @@ export class Parser {
     return left;
   }
 
-  private bool_term(): ASTNode {
-    let left = this.bool_factor();
+  private conditional_term(): ASTNode {
+    let left = this.conditional_factor();
 
     while(
       this.currentToken.type === TokenType.And
     ) {
       this.eat(TokenType.And);
-      left = new ConditionalNode(left, TokenType.And, this.bool_factor(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+      left = new ConditionalNode(left, TokenType.And, this.conditional_factor(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
 
     return left;
   }
 
-  private conditional(): ASTNode {
-    let left = this.bool_term();
+  private conditional_expression(): ASTNode {
+    let left = this.conditional_term();
 
     while(
       this.currentToken.type === TokenType.Or
     ) {
       this.eat(TokenType.Or);
-      left = new ConditionalNode(left, TokenType.Or, this.bool_term(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+      left = new ConditionalNode(left, TokenType.Or, this.conditional_term(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
 
     return left;
@@ -97,7 +104,7 @@ export class Parser {
     this.eat(TokenType.If);
     
     this.eat(TokenType.LeftParen);
-    const condition = this.conditional(); // Parse da condição
+    const condition = this.conditional_expression(); // Parse da condição
     this.eat(TokenType.RightParen);
     
     this.eat(TokenType.LeftBracket);
@@ -119,7 +126,7 @@ export class Parser {
     this.eat(TokenType.While);
     
     this.eat(TokenType.LeftParen);
-    const condition = this.conditional(); // Parse da condição
+    const condition = this.conditional_expression(); // Parse da condição
     this.eat(TokenType.RightParen);
 
     this.eat(TokenType.LeftBracket);
@@ -134,7 +141,7 @@ export class Parser {
     
     this.eat(TokenType.LeftParen);
     const index = this.initialization();
-    const condition = this.conditional(); // Parse da condição
+    const condition = this.conditional_expression(); // Parse da condição
     this.eat(TokenType.Semicolon);
     const endStatement = this.statement();
     this.eat(TokenType.RightParen);

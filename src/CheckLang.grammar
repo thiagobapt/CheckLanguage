@@ -6,13 +6,13 @@ Initialization { "var" Name "=" expression ";" }
 
 Assignment { Name "=" expression ";" }
 
-If_Statement { "if" "(" Conditional ")" Statement_List Else_Statement? }
+If_Statement { "if" "(" Conditional_Expression ")" Statement_List Else_Statement? }
 
 Else_Statement { "else" Statement_List }
 
-While_Statement { "while" "(" Conditional ")" "{" statement "}" }
+While_Statement { "while" "(" Conditional_Expression ")" "{" statement "}" }
 
-For_Statement { "for" "(" Assignment ";" Conditional ";" statement ")" Statement_List }
+For_Statement { "for" "(" Assignment ";" Conditional_Expression ";" statement ")" Statement_List }
 
 Return_Statement { "return" expression ";" }
 
@@ -34,11 +34,14 @@ factor { Number | Name | String | Boolean | Function_Call | Array | "(" expressi
 
 Array { "[" expression ("," expression)* "]" }
 
-Conditional { bool_term ( Or bool_term )? }
+Conditional_Expression { bool_term ( Or bool_term )? }
 
-bool_term { bool_factor ( And bool_factor )? }
+bool_term { conditional_factor ( And conditional_factor )? }
 
-bool_factor { expression Logical_Operator expression }
+conditional_factor {
+   expression Logical_Operator expression
+   | "(" Conditional_Expression ")"
+ }
 
 @skip { 
   space | Comment

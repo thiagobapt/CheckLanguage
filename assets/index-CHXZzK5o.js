@@ -53,16 +53,16 @@ Error generating stack: `+s.message+`
 This is a demonstration of the Check Language with the recursive function "fibonacci" that returns the fibonacci sequence.
 */
 
-printLn("Fibonacci sequence: ")
+printLn("Fibonacci sequence: ");
 
 function fibonacci(number previousValue, number currentValue) {
   if(currentValue < 1000) { 
     var newValue = currentValue + previousValue;
-    printLn(currentValue)
+    printLn(currentValue);
     return fibonacci(currentValue, newValue);
   } else {
     return currentValue;
   }
 }
 
-printLn(fibonacci(0, 1))`),[t,i]=_e.useState("");return Be.jsx(Be.Fragment,{children:Be.jsxs("div",{className:"w-screen h-screen",children:[Be.jsxs("div",{className:"h-3/5 flex flex-col place-content-start",children:[Be.jsxs("h1",{className:"w-full text-lg md:text-6xl text-center font-zendots flex place-content-center space-x-2",children:[Be.jsx("strong",{className:"text-green-400 align-middle",children:"CHECK"})," ",Be.jsx("strong",{className:"text-green-600",children:"Language"})]}),Be.jsx("h2",{className:"w-full text-center",children:"An interpreted language made with Typescript"}),Be.jsx("div",{className:"overflow-auto",children:Be.jsx(jw,{value:n,minHeight:"100vh",onChange:r=>{e(r)},theme:_2,extensions:[fP()]})})]}),Be.jsxs("div",{className:"h-2/5 p-4 w-screen flex flex-wrap place-content-start space-y-1 overflow-hidden bg-stone-900",children:[Be.jsx("div",{className:"flex place-content-start items-center w-full h-10 border-b-[1px] border-slate-600/20",children:Be.jsx("button",{className:"h-6 w-fit text-white/80 text-sm bg-transparent focus:outline-none hover:border-b-2 hover:border-b-slate-600",onClick:()=>{let r="";try{r=uP(n)}catch(s){r=s}i(r)},children:"RUN CODE"})}),Be.jsx("textarea",{className:"w-full h-full disabled:bg-stone-900 resize-none",value:t,disabled:!0})]})]})})}Ky(document.getElementById("root")).render(Be.jsx(_e.StrictMode,{children:Be.jsx(dP,{})}));
+printLn(fibonacci(0, 1));`),[t,i]=_e.useState("");return Be.jsx(Be.Fragment,{children:Be.jsxs("div",{className:"w-screen h-screen",children:[Be.jsxs("div",{className:"h-3/5 flex flex-col place-content-start",children:[Be.jsxs("h1",{className:"w-full text-lg md:text-6xl text-center font-zendots flex place-content-center space-x-2",children:[Be.jsx("strong",{className:"text-green-400 align-middle",children:"CHECK"})," ",Be.jsx("strong",{className:"text-green-600",children:"Language"})]}),Be.jsx("h2",{className:"w-full text-center",children:"An interpreted language made with Typescript"}),Be.jsx("div",{className:"overflow-auto",children:Be.jsx(jw,{value:n,minHeight:"100vh",onChange:r=>{e(r)},theme:_2,extensions:[fP()]})})]}),Be.jsxs("div",{className:"h-2/5 p-4 w-screen flex flex-wrap place-content-start space-y-1 overflow-hidden bg-stone-900",children:[Be.jsx("div",{className:"flex place-content-start items-center w-full h-10 border-b-[1px] border-slate-600/20",children:Be.jsx("button",{className:"h-6 w-fit text-white/80 text-sm bg-transparent focus:outline-none hover:border-b-2 hover:border-b-slate-600",onClick:()=>{let r="";try{r=uP(n)}catch(s){r=s}i(r)},children:"RUN CODE"})}),Be.jsx("textarea",{className:"w-full h-full disabled:bg-stone-900 resize-none",value:t,disabled:!0})]})]})})}Ky(document.getElementById("root")).render(Be.jsx(_e.StrictMode,{children:Be.jsx(dP,{})}));

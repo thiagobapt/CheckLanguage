@@ -7,8 +7,8 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
 ## Grammar
 ```
 <program>                ::= <statement> | <statement> <program>
-<statement_list>         ::= <statement> ( <statement> )*
-<statement>              ::= <assignment> 
+<statement_list>         ::= <statement> { <statement> }
+<statement>              ::= <assignment>
                             | <initialization> 
                             | <expression> ";"
                             | <if_statement>
@@ -16,14 +16,14 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
                             | <for_statement>
 <initialization>         ::= "var" <name> "=" <expression> ";"
 <assignment>             ::= <name> "=" <expression> ";"
-<if_statement>           ::= "if" "(" <conditional> ")" "{" <statement_list> "}" ("else" "{" <statement_list> "}" )
-<while_statement>        ::= "while" "(" <conditional> ")" "{" <statement> "}"
-<for_statement>          ::= "for" "(" <assignment> ";" <conditional> ";" <statement> ")" "{" <statement> "}"
-<function>               ::= <name> "(" <expression_list> ")" ( ";" )
+<if_statement>           ::= "if" "(" <conditional_expression> ")" "{" <statement_list> "}" [ "else" "{" <statement_list> "}" ]
+<while_statement>        ::= "while" "(" <conditional_expression> ")" "{" <statement> "}"
+<for_statement>          ::= "for" "(" <assignment> ";" <conditional_expression> ";" <statement> ")" "{" <statement> "}"
+<function>               ::= <name> "(" <expression_list> ")"
 <function_declaration>   ::= "function" <name> "(" <parameter_declaration> ")" "{" statement_list return_statement "}"
-<return_statement>       ::= "return" statement ";"
-<expression_list>             ::= { <expression> | ( "," <expression> )* }
-<parameter_declaration>  ::= { <types> <name> | ( "," <types> <name> )* }
+<return_statement>       ::= "return" <statement> ";"
+<expression_list>        ::= <expression> { "," <expression> }
+<parameter_declaration>  ::= <type> <name> { "," <type> <name> }
 <expression>             ::= <term> { ("+" | "-") <term> }
 <term>                   ::= <factor> { ("*" | "/") <factor> }
 <factor>                 ::= <number> 
@@ -33,16 +33,17 @@ Experiment with Check Language in the [code sandbox](https://thiagobapt.github.i
                             | <array>
                             | <function>
                             | "(" <expression> ")"
-<conditional>            ::= <bool_term> { ("or") <bool_term> }
-<bool_term>              ::= <bool_factor> { ("and") <bool_factor> }
-<bool_factor>            ::= <expression> <relational_operator> <expression>
-<relational_operator>    ::= "==" | "!=" | "<" | "<=" | ">" | ">="
+<conditional_expression> ::= <conditional_term> { "||" <conditional_term> }
+<conditional_term>       ::= <conditional_factor> { "&&" <conditional_factor> }
+<conditional_factor>     ::= <expression> <logical_operator> <expression>
+                            | "(" conditional_expression ")"
+<logical_operator>       ::= "==" | "!=" | "<" | "<=" | ">" | ">="
 <number>                 ::= [0-9]+
-<array>                  ::= "[" <expression> ("," <expression>)* "]"
+<array>                  ::= "[" <expression> { "," <expression> } "]"
 <name>                   ::= [a-zA-Z_][a-zA-Z0-9_]*
 <string>                 ::= '"' .* '"'
 <comment>                 ::= '/*' .* '*/'
-<types>                  ::= ( "string"| "number" | "bool" | "array" )
+<type>                  ::= ( "string"| "number" | "bool" | "array" )
 ```
 
 ## Dictionary

@@ -84,21 +84,21 @@ function App() {
 This is a demonstration of the Check Language with the recursive function "fibonacci" that returns the fibonacci sequence.
 */
 
-printLn("Fibonacci sequence: ")
+printLn("Fibonacci sequence: ");
 
 function fibonacci(number previousValue, number currentValue) {
   if(currentValue < 1000) { 
     var newValue = currentValue + previousValue;
-    printLn(currentValue)
+    printLn(currentValue);
     return fibonacci(currentValue, newValue);
   } else {
     return currentValue;
   }
 }
 
-printLn(fibonacci(0, 1))`);
+printLn(fibonacci(0, 1));`);
   const [output, setOutput] = useState("");
-
+  
   return (
     <>
       <div className="w-screen h-screen">

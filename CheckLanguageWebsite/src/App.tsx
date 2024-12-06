@@ -27,7 +27,7 @@ let parserWithMetadata = parser.configure({
       "Function_Call/Name": t.function(t.attributeName),
       "Function_Declaration": t.definition(t.atom),
       "Function_Declaration/Name": t.function(t.attributeName),
-      "Parameter_Declaration/Types": t.atom,
+      "Parameter_Declaration/Types": t.typeName,
       Logical_Operator: t.logicOperator,
       Expression_Operator: t.arithmeticOperator,
       Term_Operator: t.arithmeticOperator,

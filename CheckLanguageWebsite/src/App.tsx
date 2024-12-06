@@ -117,7 +117,6 @@ printLn(fibonacci(0, 1));`);
               let result = "";
               try {
                 result = interpretProgram(text)!;
-                console.group
               } catch (e: any) {
                 result = e;
               }

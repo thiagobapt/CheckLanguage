@@ -1,6 +1,6 @@
 // parser.ts
 import { Token, TokenType, Lexer } from "./lexer";
-import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode, ReturnNode, ArrayNode } from "./ast-nodes";
+import { BinaryOpNode, NumberNode, NameNode, AssignmentNode, ASTNode, IfNode, ConditionalNode, WhileNode, ForNode, InitializationNode, StringNode, BooleanNode, FunctionCallNode, FunctionDeclarationNode, FunctionNode, ParameterDeclarationNode, ReturnNode, ArrayNode, IndexNode } from "./ast-nodes";
 import { BooleanVariable, NumberVariable, StringVariable, Variable, VariableType } from "./variables";
 
 export class Parser {
@@ -158,11 +158,25 @@ export class Parser {
   private factor(): ASTNode {
     const token = this.currentToken;
     if (token.type === TokenType.Number) {
+
       this.eat(TokenType.Number);
       return new NumberNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
     } else if (token.type === TokenType.Name) {
+
       this.eat(TokenType.Name);
-      return new NameNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+      const nameNode = new NameNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
+      if(this.currentToken.type === TokenType.LeftSquareBracket) {
+        this.eat(TokenType.LeftSquareBracket);
+        const node = this.expr();
+        this.eat(TokenType.RightSquareBracket);
+
+        return new IndexNode(nameNode, node, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+      }
+
+      return nameNode;
+
     } else if (token.type === TokenType.Function) {
 
       this.eat(TokenType.Function);
@@ -181,21 +195,35 @@ export class Parser {
       return node;
 
     } else if (token.type === TokenType.String) {
+
       this.eat(TokenType.String);
       return new StringNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
     } else if (token.type === TokenType.Boolean) {
+
       this.eat(TokenType.Boolean);
       return new BooleanNode(token.value, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
     } else if (token.type === TokenType.LeftParen) {
+
       this.eat(TokenType.LeftParen);
       const node = this.expr();
       this.eat(TokenType.RightParen);
       return node;
+
     } else if (token.type === TokenType.LeftSquareBracket) {
+
       this.eat(TokenType.LeftSquareBracket);
       const nodes = this.expression_list();
       this.eat(TokenType.RightSquareBracket);
-      return new ArrayNode(nodes, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
+      const array = new ArrayNode(nodes, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+
+      if(this.currentToken.type === TokenType.LeftSquareBracket) {
+        return this.index(array);
+      }
+
+      return array;
     }
     throw new Error(`Invalid factor: ${token.value}. At line: ${this.lexer.getCurrentLine()}:${this.lexer.getCurrentLineChar()}`);
   }
@@ -224,6 +252,23 @@ export class Parser {
       this.eat(token.type);
       node = new BinaryOpNode(node, token.value, this.term(), this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
     }
+    return node;
+  }
+
+  private index(previousNode: ASTNode): ASTNode {
+    this.eat(TokenType.LeftSquareBracket);
+    const indexNumber = this.expr();
+    this.eat(TokenType.RightSquareBracket);
+
+    let node = new IndexNode(previousNode, indexNumber, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar())
+
+    while (
+      this.currentToken.type === TokenType.LeftSquareBracket ||
+      this.currentToken.type === TokenType.RightSquareBracket
+    ) {
+      node = new IndexNode(this.index(node), indexNumber, this.lexer.getCurrentLine(), this.lexer.getCurrentLineChar());
+    }
+
     return node;
   }
 

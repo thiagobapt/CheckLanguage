@@ -73,6 +73,18 @@ export interface ASTNode {
     }
     type = "Array";
   }
+
+  export class IndexNode implements ASTNode {
+    id: number;
+    line: number;
+    char: number;
+    constructor(public value: ASTNode, public index: ASTNode, line: number, char: number) {
+      this.id = ASTNodeCounter.getNextId();
+      this.line = line;
+      this.char = char;
+    }
+    type = "Array";
+  }
   
   export class NameNode implements ASTNode {
     id: number;

@@ -18,6 +18,7 @@ import {
   ParameterDeclarationNode,
   FunctionDeclarationNode,
   ArrayNode,
+  IndexNode,
 } from "./ast-nodes";
 import { FunctionVariable, concat, index, pop, printLn, push, setIndex } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
@@ -144,6 +145,29 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
       variables.push(executeAST(arrayNode, context));
     }
     return new ArrayVariable(variables);
+
+  } else if (node instanceof IndexNode) {
+    const index = executeAST(node.index, context);
+
+    if(index.type !== VariableType.Number) {
+      throw new Error(`Value ${index} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
+    }
+
+    if(index.value === undefined) {
+      throw new Error(`Value ${index} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
+    }
+
+    const array = executeAST(node.value, context);
+    
+    if(array.type !== VariableType.Array) {
+        throw new Error(`Can't access index of type ${array.type}, must be of type ARRAY. At line: ${node.line}:${node.char}`);
+    }
+
+    if(array.value.length <= index.value) {
+      throw new Error(`Index ${index.value} is out of bounds for array ${array.name}. At line: ${node.line}:${node.char}`);
+    }
+
+    return array.value[index.value];
 
   } else if (node instanceof NameNode) {
 

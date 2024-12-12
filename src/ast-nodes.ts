@@ -189,6 +189,19 @@ export interface ASTNode {
     type = "Assignment";
   }
 
+  export class IndexAssignmentNode implements ASTNode {
+    id: number;
+    constructor(
+      public name: NameNode,
+      public value: ASTNode,
+      public indexes: ASTNode[], 
+      public line: number,
+      public char: number) {
+      this.id = ASTNodeCounter.getNextId();
+    }
+    type = "Array";
+  }
+
   // Representa uma expressão condicional (ex.: x < 10)
   export class ConditionalNode implements ASTNode {
     id: number;

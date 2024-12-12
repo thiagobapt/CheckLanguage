@@ -19,6 +19,7 @@ import {
   FunctionDeclarationNode,
   ArrayNode,
   IndexNode,
+  IndexAssignmentNode,
 } from "./ast-nodes";
 import { FunctionVariable, concat, index, pop, printLn, push, setIndex } from "./functions";
 import { evaluateBinaryOp, evaluateCondition } from "./utils";
@@ -147,13 +148,10 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
     return new ArrayVariable(variables);
 
   } else if (node instanceof IndexNode) {
+    
     const index = executeAST(node.index, context);
 
-    if(index.type !== VariableType.Number) {
-      throw new Error(`Value ${index} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
-    }
-
-    if(index.value === undefined) {
+    if(index.type !== VariableType.Number || index.value === undefined) {
       throw new Error(`Value ${index} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
     }
 
@@ -177,6 +175,26 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
     const value = executeAST(node.value, context);
     value.name = node.name.value;
+    context.setVariable(node.name.value, value);
+    return value;
+
+  }else if (node instanceof IndexAssignmentNode) {
+
+    const value = executeAST(node.value, context);
+    value.name = node.name.value;
+
+    const array = context.getVariable(node.name.value);
+
+    if(array.type !== VariableType.Array) throw new Error(`Can't access index of type ${array.type}, must be of type ARRAY. At line: ${node.line}:${node.char}`);
+
+    for(const index of node.indexes) {
+      const indexNumber = executeAST(index, context);
+
+      if(indexNumber.type !== VariableType.Number) throw new Error(`Value ${indexNumber} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
+
+      
+    }
+
     context.setVariable(node.name.value, value);
     return value;
 

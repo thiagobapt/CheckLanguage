@@ -8,6 +8,7 @@
                             | <for_statement>
 <initialization>         ::= "var" <name> "=" <expression> ";"
 <assignment>             ::= <name> "=" <expression> ";"
+<index_assignment>       ::= <name> { "[" <expression> "]" } "=" <expression> ";"
 <if_statement>           ::= "if" "(" <conditional_expression> ")" "{" <statement_list> "}" [ "else" "{" <statement_list> "}" ]
 <while_statement>        ::= "while" "(" <conditional_expression> ")" "{" <statement> "}"
 <for_statement>          ::= "for" "(" <assignment> ";" <conditional_expression> ";" <statement> ")" "{" <statement> "}"

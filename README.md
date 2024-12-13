@@ -16,6 +16,7 @@
                             | <for_statement>
 <initialization>         ::= "var" <name> "=" <expression> ";"
 <assignment>             ::= <name> "=" <expression> ";"
+<index_assignment>       ::= <name> { "[" <expression> "]" } "=" <expression> ";"
 <if_statement>           ::= "if" "(" <conditional_expression> ")" "{" <statement_list> "}" [ "else" "{" <statement_list> "}" ]
 <while_statement>        ::= "while" "(" <conditional_expression> ")" "{" <statement> "}"
 <for_statement>          ::= "for" "(" <assignment> ";" <conditional_expression> ";" <statement> ")" "{" <statement> "}"
@@ -32,6 +33,7 @@
                             | <boolean>
                             | <array>
                             | <function>
+                            | <index>
                             | "(" <expression> ")"
 <conditional_expression> ::= <conditional_term> { "||" <conditional_term> }
 <conditional_term>       ::= <conditional_factor> { "&&" <conditional_factor> }
@@ -40,6 +42,7 @@
 <logical_operator>       ::= "==" | "!=" | "<" | "<=" | ">" | ">="
 <number>                 ::= [0-9]+
 <array>                  ::= "[" <expression> { "," <expression> } "]"
+<index>                  ::= <array> { "[" <expression> "]" }
 <name>                   ::= [a-zA-Z_][a-zA-Z0-9_]*
 <string>                 ::= '"' .* '"'
 <comment>                 ::= '/*' .* '*/'

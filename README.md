@@ -67,7 +67,3 @@
 | `array`       | Data type: list               |
 | `true`        | Boolean value: true           |
 | `false`       | Boolean value: false          |
-
-## Project Documentation
-https://docs.google.com/document/d/1syiRyh4AbRsDIyqXPEL1-A7_LkdYG9xqsPr2amoVKQo/edit?tab=t.0
-https://www.canva.com/design/DAGY0d-ErV0/Tv6LP1Ae06-SRVh0HMC8aw/edit?utm_content=DAGY0d-ErV0&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton

@@ -187,15 +187,42 @@ export function executeAST(node: ASTNode, context: ExecutionContext): Variable {
 
     if(array.type !== VariableType.Array) throw new Error(`Can't access index of type ${array.type}, must be of type ARRAY. At line: ${node.line}:${node.char}`);
 
-    for(const index of node.indexes) {
-      const indexNumber = executeAST(index, context);
+    const enterArray = (indexes: ASTNode[], currentArray: ArrayVariable): ArrayVariable => {
+      const indexNumber = executeAST(indexes.shift()!, context);
 
-      if(indexNumber.type !== VariableType.Number) throw new Error(`Value ${indexNumber} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
-
+      if(indexNumber.type !== VariableType.Number || indexNumber.value === undefined) throw new Error(`Value ${indexNumber} can't be used as an index, must be of type NUMBER. At line: ${node.line}:${node.char}`);
       
+
+      if(indexes.length === 0) {
+        if(indexNumber.value >= currentArray.value.length) throw new Error(`Index ${indexNumber.value} is out of bounds for array ${array.name}. At line: ${node.line}:${node.char}`);
+
+        currentArray.value[indexNumber.value] = value;
+        return currentArray;
+      }
+
+      const finalArray = [];
+
+      for (let i = 0; i < currentArray.value.length; i++) {
+
+        if(i === indexNumber.value) {
+          const element = currentArray.value[indexNumber.value];
+
+          if(element.type !== VariableType.Array) throw new Error(`Can't access index of type ${element.type}, must be of type ARRAY. At line: ${node.line}:${node.char}`);
+
+          currentArray.value[indexNumber.value] = enterArray(indexes, element);
+        }
+
+        finalArray.push(currentArray.value[i]);
+      }
+
+      return new ArrayVariable(finalArray);
+    
     }
 
-    context.setVariable(node.name.value, value);
+    const finalArray = enterArray(node.indexes, array)
+
+    context.setVariable(node.name.value, finalArray);
+
     return value;
 
   }  else if (node instanceof InitializationNode) {

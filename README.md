@@ -3,6 +3,7 @@
 
 # Experiment with Check Language in the [code sandbox](https://thiagobapt.github.io/CheckLanguage/)!
 
+This language was made as a project for the university USJT-Mooca. It takes a very naive approach to compilers.
 
 ## Grammar
 ```

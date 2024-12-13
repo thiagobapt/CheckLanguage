@@ -1,6 +1,7 @@
 <program>                ::= <statement> | <statement> <program>
 <statement_list>         ::= <statement> { <statement> }
 <statement>              ::= <assignment>
+                            | <index_assignment>
                             | <initialization> 
                             | <expression> ";"
                             | <if_statement>
